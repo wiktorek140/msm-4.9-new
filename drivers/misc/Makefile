@@ -70,6 +70,7 @@ EXTRA_CFLAGS += -DCONFIG_CAPSENSE_USB_CAL
 EXTRA_CFLAGS += -Idrivers/base
 
 obj-$(CONFIG_SENSORS_STML0XX) += stml0xx/
+obj-$(CONFIG_MODS_USB_EXT_BRIDGE) += usb_ext_bridge.o
 
 obj-$(CONFIG_UID_SYS_STATS)	+= uid_sys_stats.o
 obj-$(CONFIG_MEMORY_STATE_TIME)	+= memory_state_time.o
