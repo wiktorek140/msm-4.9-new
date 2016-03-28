@@ -286,3 +286,10 @@ config MSMB_CAMERA_LEGACY
 	depends on MSMB_CAMERA
     ---help---
       This flag enables support for 2017 Motorola devices.
+
+config DEBUG_CAMERA
+	bool "Enable Camera Debug"
+	depends on MSMB_CAMERA && DEBUG_FS
+	default n
+	---help---
+		Enable camera debug support.
