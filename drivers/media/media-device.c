@@ -62,6 +62,11 @@ static long media_device_get_info(struct media_device *dev, void *arg)
 {
 	struct media_device_info *info = arg;
 
+	if (!(dev->dev && dev->dev->driver)) {
+		WARN(1, "null handle to media device\n");
+		return -EFAULT;
+	}
+
 	memset(info, 0, sizeof(*info));
 
 	if (dev->driver_name[0])
