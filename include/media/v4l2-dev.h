@@ -26,7 +26,8 @@
 #define VFL_TYPE_SUBDEV		3
 #define VFL_TYPE_SDR		4
 #define VFL_TYPE_TOUCH		5
-#define VFL_TYPE_MAX		6
+#define VFL_TYPE_MOT_GRABBER	6
+#define VFL_TYPE_MAX		7
 
 /* Is this a receiver, transmitter or mem-to-mem? */
 /* Ignored for VFL_TYPE_SUBDEV. */
