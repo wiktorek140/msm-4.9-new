@@ -751,7 +751,7 @@ static int32_t msm_actuator_bivcm_move_focus(
 		pr_err("failed. i2c reg table is NULL");
 		return -EFAULT;
 	}
-	if (dest_step_pos >= a_ctrl->total_steps) {
+	if (dest_step_pos > a_ctrl->total_steps) {
 		pr_err("Step pos greater than total steps = %d\n",
 		dest_step_pos);
 		return -EFAULT;
