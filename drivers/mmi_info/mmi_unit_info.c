@@ -31,6 +31,16 @@
 #include <soc/qcom/smem.h>
 #endif
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,14,0)
+#include <linux/soc/qcom/smem.h>
+/* Match to
+ * vendor/qcom/nonhlos/boot_images/QcomPkg/SDMPkg/Include/smem_type.h
+ */
+#define SMEM_ID_VENDOR0 134
+#else
+#include <soc/qcom/smem.h>
+#endif
+
 #define SMEM_KERNEL_RESERVE SMEM_ID_VENDOR0
 
 static struct proc_dir_entry *unitinfo_procfs_file;
