@@ -2799,6 +2799,10 @@ static int qseecom_unload_app(struct qseecom_dev_handle *data,
 		pr_debug("Do not unload keymaster app from tz\n");
 		goto unload_exit;
 	}
+	if (!memcmp(data->client.app_name, "prov", strlen("prov"))) {
+		pr_debug("Do not unload prov app from tz\n");
+		goto unload_exit;
+	}
 
 	if (!memcmp(data->client.app_name, "prov", strlen("prov"))) {
 		pr_debug("Do not unload prov app from tz\n");
