@@ -124,7 +124,7 @@ config FSL_PAMU
 config MSM_IOMMU
 	bool "MSM IOMMU Support"
 	depends on ARM
-	depends on ARCH_MSM8X60 || ARCH_MSM8960 || COMPILE_TEST
+	depends on ARCH_MSM8X60 || ARCH_MSM8960 || COMPILE_TEST || ARCH_MSM8937
 	select IOMMU_API
 	select IOMMU_IO_PGTABLE_ARMV7S
 	help
