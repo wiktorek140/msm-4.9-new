@@ -481,3 +481,7 @@
 
 };
 
+&qcom_rng {
+	status = "okay";
+};
+
