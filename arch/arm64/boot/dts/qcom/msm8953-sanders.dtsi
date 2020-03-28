@@ -40,10 +40,16 @@
 
 	reserved-memory {
 		ramoops_mem: ramoops_mem_region {
+			compatible = "ramoops";
+			ramoops-annotate-size = <MMI_ANNOTATE_SIZE>;
 			no-map;
+			console-size = <RAMOOPS_CONSOLE_SIZE>;
+			pmsg-size = <RAMOOPS_PMSG_SIZE>;
+			record-size = <RAMOOPS_RECORD_SIZE>;
 			reg = <0x0 0xef000000 0x0 0x80000>;
 			label = "ramoops_mem";
 		};
+
 		tzlog_bck_mem: tzlog_bck_region {
 			no-map;
 			reg = <0x0 TZLOG_BCK_BASE_8953
@@ -553,11 +559,11 @@
 		compatible = "ramoops";
 		status = "ok";
 
-		android,ramoops-buffer-start = <0xef000000>;
+		android,ramoops-buffer-start = <RAMOOPS_BASE_ADDR>;
 		android,ramoops-buffer-size = <0x80000>;
-		android,ramoops-console-size = <0x40000>;
-		android,ramoops-record-size = <0x3F800>;
-		android,ramoops-annotate-size = <0x800>;
+		android,ramoops-console-size = <RAMOOPS_CONSOLE_SIZE>;
+		android,ramoops-record-size = <RAMOOPS_RECORD_SIZE>;
+		android,ramoops-annotate-size = <MMI_ANNOTATE_SIZE>;
 		android,ramoops-dump-oops = <0x1>;
 
 		linux,contiguous-region = <&ramoops_mem>;
