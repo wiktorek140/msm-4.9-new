@@ -127,6 +127,13 @@ dtb-$(CONFIG_CEDRIC_DTB) += \
 	msm8937-cedric-p3.dtb \
 	msm8937-cedric-p4.dtb \
 	msm8937-cedric-p5.dtb
+
+dtb-$(CONFIG_SANDERS_DTB) += \
+	msm8953-sanders-p1.dtb \
+	msm8953-sanders-p2.dtb \
+	msm8953-sanders-p3.dtb \
+	msm8953-sanders-p4.dtb
+
 endif
 
 ifneq ($(CONFIG_MMI_DTB),y)
