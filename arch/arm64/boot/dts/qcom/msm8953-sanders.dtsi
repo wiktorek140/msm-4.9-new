@@ -67,7 +67,7 @@
 	tzlog_bck_mem: tzlog_bck_region {
 		no-map;
 		reg = <0x0 TZLOG_BCK_BASE_8953
-			0x0 TZLOG_BCK_SIZE>;
+			0x0 TZLOG_BCK_SIZE_8953>;
 		label = "tzlog_bck_mem";
 	};
 
