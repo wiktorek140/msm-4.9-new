@@ -77,6 +77,12 @@
 			0x0 WDOG_CPUCTX_SIZE_8953>;
 		label = "wdog_cpuctx_mem";
 	};
+
+	mmi_annotate_mem: mmi_annotate_mem_region {
+			no-map;
+			reg = <0x0 MMI_ANNOTATE_BASE_8953
+					0x0 MMI_ANNOTATE_SIZE>;
+	};
 };
 
 &soc{
@@ -567,6 +573,12 @@
 		android,ramoops-dump-oops = <0x1>;
 
 		linux,contiguous-region = <&ramoops_mem>;
+	};
+
+	mmi_annotate {
+		compatible = "mmi,annotate";
+		memory-region = <&mmi_annotate_mem>;
+		mem-size = <0x20000>;
 	};
 
 	wdog: qcom,wdt@b017000 {
