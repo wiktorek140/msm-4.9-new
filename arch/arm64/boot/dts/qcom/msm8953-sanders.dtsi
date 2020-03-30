@@ -60,7 +60,7 @@
 		console-size = <RAMOOPS_CONSOLE_SIZE>;
 		pmsg-size = <RAMOOPS_PMSG_SIZE>;
 		record-size = <RAMOOPS_RECORD_SIZE>;
-		reg = <0x0 0xef000000 0x0 0x80000>;
+		reg = <0x0 RAMOOPS_BASE_ADDR_8953 0x0 RAMOOPS_SIZE>;
 		label = "ramoops_mem";
 	};
 
@@ -565,8 +565,8 @@
 		compatible = "ramoops";
 		status = "ok";
 
-		android,ramoops-buffer-start = <RAMOOPS_BASE_ADDR>;
-		android,ramoops-buffer-size = <0x80000>;
+		android,ramoops-buffer-start = <RAMOOPS_BASE_ADDR_8953>;
+		android,ramoops-buffer-size = <RAMOOPS_SIZE>;
 		android,ramoops-console-size = <RAMOOPS_CONSOLE_SIZE>;
 		android,ramoops-record-size = <RAMOOPS_RECORD_SIZE>;
 		android,ramoops-annotate-size = <MMI_ANNOTATE_SIZE>;
