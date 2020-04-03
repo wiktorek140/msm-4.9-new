@@ -40,6 +40,13 @@
 			SNDRV_PCM_RATE_192000)
 #define SDM660_CDC_FORMATS (SNDRV_PCM_FMTBIT_S16_LE |\
 		SNDRV_PCM_FMTBIT_S24_LE | SNDRV_PCM_FMTBIT_S24_3LE)
+
+#define MSM8X16_WCD_RATES (SNDRV_PCM_RATE_8000 | SNDRV_PCM_RATE_16000 |\
+			SNDRV_PCM_RATE_32000 | SNDRV_PCM_RATE_48000)
+#define MSM8X16_WCD_FORMATS (SNDRV_PCM_FMTBIT_S16_LE |\
+		SNDRV_PCM_FMTBIT_S24_LE |\
+		SNDRV_PCM_FMTBIT_S24_3LE)
+
 #define MSM_DIG_CDC_STRING_LEN 80
 #define MSM_ANLG_CDC_VERSION_ENTRY_SIZE 32
 
@@ -3226,8 +3233,13 @@ static struct snd_soc_dai_driver msm_anlg_cdc_i2s_dai[] = {
 		.id = AIF2_VIFEED,
 		.capture = {
 			.stream_name = "VIfeed",
+#if defined(CONFIG_SND_SOC_CS35L35)
+			.rates = MSM8X16_WCD_RATES,
+			.formats = MSM8X16_WCD_FORMATS,
+#else
 			.rates = SDM660_CDC_RATES,
 			.formats = SDM660_CDC_FORMATS,
+#endif
 			.rate_max = 48000,
 			.rate_min = 48000,
 			.channels_min = 2,
