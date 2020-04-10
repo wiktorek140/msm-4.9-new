@@ -1813,33 +1813,33 @@ static int cs35l35_dai_init(struct snd_soc_pcm_runtime *rtd)
 struct snd_soc_dai_link_component dlc_rx1[] = {
 	{
 		.of_node = NULL,
-		.dai_name = "msm_dig_cdc_dai_rx1",
+		.dai_name  = "msm_anlg_cdc_i2s_rx1",
 	},
 	{
 		.of_node = NULL,
-		.dai_name  = "msm_anlg_cdc_i2s_rx1",
+		.dai_name = "msm_dig_cdc_dai_rx1",
 	},
 };
 
 struct snd_soc_dai_link_component dlc_tx1[] = {
 	{
 		.of_node = NULL,
-		.dai_name = "msm_dig_cdc_dai_tx1",
+		.dai_name  = "msm_anlg_cdc_i2s_tx1",
 	},
 	{
 		.of_node = NULL,
-		.dai_name  = "msm_anlg_cdc_i2s_tx1",
+		.dai_name = "msm_dig_cdc_dai_tx1",
 	},
 };
 
 struct snd_soc_dai_link_component dlc_vifeed[] = {
 	{
 		.of_node = NULL,
-		.dai_name = "msm_dig_cdc_dai_vifeed",
+		.dai_name  = "msm_anlg_vifeedback",
 	},
 	{
 		.of_node = NULL,
-		.dai_name  = "msm_anlg_vifeedback",
+		.dai_name = "msm_dig_cdc_dai_vifeed",
 	},
 };
 
