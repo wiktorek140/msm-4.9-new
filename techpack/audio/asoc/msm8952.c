@@ -45,6 +45,21 @@
 #define PMIC_INT_ANALOG_CODEC "analog-codec"
 #define PMIC_INT_CAJON_CODEC "cajon_codec"
 
+#if !IS_ENABLED(CONFIG_SND_SOC_WSA881X_ANALOG)
+int wsa881x_get_probing_count(void) {
+	return 0;
+}
+
+int wsa881x_get_presence_count(void) {
+	return 0;
+}
+
+int wsa881x_set_mclk_callback(
+	int (*enable_mclk_callback)(struct snd_soc_card *, bool)) {
+	return 0;
+}
+#endif
+
 enum btsco_rates {
 	RATE_8KHZ_ID,
 	RATE_16KHZ_ID,
