@@ -42,19 +42,11 @@
 #define MAX_WSA_CODEC_NAME_LENGTH 80
 #define MSM_DT_MAX_PROP_SIZE 80
 
-#ifdef CONFIG_MONTANA_DTB
-enum {
-	ANA_CDC,
-	CODECS_MAX,
-	DIG_CDC = ANA_CDC,
-};
-#else
 enum {
 	DIG_CDC,
 	ANA_CDC,
 	CODECS_MAX,
 };
-#endif
 
 enum {
 	PRIM_MI2S = 0,
