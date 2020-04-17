@@ -28,6 +28,9 @@
 #include "adsp_err.h"
 #include <dsp/q6core.h>
 
+#ifdef CONFIG_SND_SOC_OPALUM
+#include <sound/ospl2xx.h>
+#endif
 #ifdef CONFIG_SND_SOC_TAS2560
 #include <sound/tas2560_algo.h>
 #endif
@@ -206,6 +209,18 @@ extern int crus_afe_set_callback(
 	return 0;
 }
 EXPORT_SYMBOL(crus_afe_set_callback);
+#endif
+
+#ifdef CONFIG_SND_SOC_OPALUM
+int32_t (*ospl2xx_callback)(struct apr_client_data *data);
+
+int ospl2xx_afe_set_callback(
+	int32_t (*ospl2xx_callback_func)(struct apr_client_data *data))
+{
+	ospl2xx_callback = ospl2xx_callback_func;
+	return 0;
+}
+EXPORT_SYMBOL(ospl2xx_afe_set_callback);
 #endif
 
 #define TIMEOUT_MS 1000
@@ -441,6 +456,15 @@ static int32_t afe_callback(struct apr_client_data *data, void *priv)
 	afe_callback_debug_print(data);
 	if (data->opcode == AFE_PORT_CMDRSP_GET_PARAM_V2) {
 		uint32_t *payload = data->payload;
+#ifdef CONFIG_SND_SOC_OPALUM
+		int32_t *payload32 = data->payload;
+		if (payload32[1] == AFE_CUSTOM_OPALUM_RX_MODULE ||
+		    payload32[1] == AFE_CUSTOM_OPALUM_TX_MODULE) {
+			if (ospl2xx_callback != NULL)
+				ospl2xx_callback(data);
+			atomic_set(&this_afe.state, 0);
+		} else {
+#endif
 		if (!payload || (data->token >= AFE_MAX_PORTS)) {
 			pr_err("%s: Error: size %d payload %pK token %d\n",
 				__func__, data->payload_size,
@@ -514,6 +538,9 @@ static int32_t afe_callback(struct apr_client_data *data, void *priv)
 			wake_up(&this_afe.wait[data->token]);
 		else
 			return -EINVAL;
+#ifdef CONFIG_SND_SOC_OPALUM
+		}
+#endif
 	} else if (data->payload_size) {
 		uint32_t *payload;
 		uint16_t port_id = 0;
@@ -1016,6 +1043,21 @@ extern int afe_apr_send_pkt_crus(void *data, int index)
 }
 EXPORT_SYMBOL(afe_apr_send_pkt_crus);
 #endif
+
+#ifdef CONFIG_SND_SOC_OPALUM
+extern int ospl2xx_afe_apr_send_pkt(void *data, int index)
+{
+	int ret = 0;
+
+	ret = afe_q6_interface_prepare();
+	if (ret != 0) {
+		pr_err("%s: Q6 interface prepare failed %d\n", __func__, ret);
+		return -EINVAL;
+	}
+	return afe_apr_send_pkt(data, &this_afe.wait[index]);
+}
+EXPORT_SYMBOL(ospl2xx_afe_apr_send_pkt);
+#endif	
 
 static int afe_send_cal_block(u16 port_id, struct cal_block_data *cal_block)
 {
@@ -4344,7 +4386,7 @@ int afe_get_port_index(u16 port_id)
 		return -EINVAL;
 	}
 }
-#if defined (CONFIG_SND_SOC_TAS2560) || defined (CONFIG_CIRRUS_PLAYBACK)
+#if defined (CONFIG_SND_SOC_TAS2560) || defined (CONFIG_CIRRUS_PLAYBACK) || defined (CONFIG_SND_SOC_OPALUM) 
 EXPORT_SYMBOL(afe_get_port_index);
 #endif
 
