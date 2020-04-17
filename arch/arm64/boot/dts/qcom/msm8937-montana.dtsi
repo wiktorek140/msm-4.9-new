@@ -485,3 +485,10 @@
 	status = "okay";
 };
 
+&wsa881x_i2c_45 {
+	status = "disabled";
+};
+
+&wsa881x_i2c_f {
+	status = "disabled";
+};
