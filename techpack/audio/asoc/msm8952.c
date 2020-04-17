@@ -1734,7 +1734,9 @@ static int msm_audrx_init(struct snd_soc_pcm_runtime *rtd)
 		goto done;
 	}
 	pdata->codec_root = codec_root;
+#ifndef CONFIG_MONTANA_DTB
 	msm_dig_codec_info_create_codec_entry(codec_root, dig_cdc);
+#endif
 	msm_anlg_codec_info_create_codec_entry(codec_root, ana_cdc);
 done:
 	return 0;
@@ -3074,6 +3076,7 @@ codec_dai:
 		if ((dai_link[i].id == MSM_BACKEND_DAI_PRI_MI2S_RX) ||
 		(dai_link[i].id == MSM_BACKEND_DAI_TERTIARY_MI2S_TX) ||
 		(dai_link[i].id == MSM_BACKEND_DAI_SENARY_MI2S_TX)) {
+#ifndef CONFIG_MONTANA_DTB
 			index = of_property_match_string(
 						cdev->of_node,
 						"asoc-codec-names",
@@ -3083,11 +3086,16 @@ codec_dai:
 					cdev->of_node,
 					"asoc-codec", index);
 			dai_link[i].codecs[DIG_CDC].of_node = phandle;
+#endif
 
 			index = of_property_match_string(
 					cdev->of_node,
 					"asoc-codec-names",
+#ifdef CONFIG_MONTANA_DTB
 					PMIC_INT_CAJON_CODEC);
+#else
+					PMIC_INT_ANALOG_CODEC);
+#endif
 
 			phandle = of_parse_phandle(
 					cdev->of_node,
