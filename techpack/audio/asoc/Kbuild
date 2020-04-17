@@ -249,5 +249,8 @@ machine_dlkm-y := $(MACHINE_OBJS)
 obj-$(CONFIG_SND_SOC_CPE) += cpe_lsm_dlkm.o
 cpe_lsm_dlkm-y := $(CPE_LSM_OBJS)
 
+# ospl2xx
+obj-$(CONFIG_SND_SOC_OPALUM)	+= ospl2xx.o
+
 # inject some build related information
 DEFINES += -DBUILD_TIMESTAMP=\"$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')\"
