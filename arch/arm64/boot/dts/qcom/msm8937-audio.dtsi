@@ -93,7 +93,7 @@
 		asoc-cpu = <&dai_pri_auxpcm>,
 			<&dai_mi2s0>, <&dai_mi2s1>,
 			<&dai_mi2s2>, <&dai_mi2s3>,
-			<&dai_mi2s4>, <&dai_mi2s5>,
+			<&dai_mi2s4>, <&dai_mi2s6>,
 			<&sb_0_rx>, <&sb_0_tx>, <&sb_1_rx>, <&sb_1_tx>,
 			<&sb_3_rx>, <&sb_3_tx>, <&sb_4_rx>, <&sb_4_tx>,
 			<&bt_sco_rx>, <&bt_sco_tx>,
@@ -259,7 +259,7 @@
 				"msm-pcm-dsp-noirq";
 
 		asoc-cpu = <&dai_pri_auxpcm>,
-				<&dai_mi2s2>, <&dai_mi2s3>, <&dai_mi2s5>,
+				<&dai_mi2s2>, <&dai_mi2s3>, <&dai_mi2s6>,
 				<&sb_0_rx>, <&sb_0_tx>, <&sb_1_rx>, <&sb_1_tx>,
 				<&sb_2_rx>, <&sb_2_tx>, <&sb_3_rx>, <&sb_3_tx>,
 				<&sb_4_rx>, <&sb_4_tx>, <&sb_5_tx>,
