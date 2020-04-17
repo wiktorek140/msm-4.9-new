@@ -1262,7 +1262,11 @@
 			wsa_clk_on: wsa_clk_on {
 				mux {
 					pins = "gpio25";
+#ifdef CONFIG_MONTANA_DTB
+					function = "sec_mi2s_mclk_a";
+#else
 					function = "pri_mi2s_mclk_a";
+#endif
 				};
 
 				config {
@@ -1275,7 +1279,11 @@
 			wsa_clk_off: wsa_clk_off {
 				mux {
 					pins = "gpio25";
+#ifdef CONFIG_MONTANA_DTB
+					function = "sec_mi2s_mclk_a";
+#else
 					function = "pri_mi2s_mclk_a";
+#endif
 				};
 
 				config {
@@ -1286,6 +1294,7 @@
 				};
 			};
 		};
+
 		pri-tlmm-lines {
 			pri_tlmm_lines_act: pri_tlmm_lines_act {
 				mux {
