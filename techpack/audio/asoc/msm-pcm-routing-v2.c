@@ -3006,6 +3006,9 @@ static const char *const be_name[] = {
 "INT2_MI2S_RX", "INT2_MI2S_TX", "INT3_MI2S_RX", "INT3_MI2S_TX",
 "INT4_MI2S_RX", "INT4_MI2S_TX", "INT5_MI2S_RX", "INT5_MI2S_TX",
 "INT6_MI2S_RX", "INT6_MI2S_TX"
+#ifdef CONFIG_MONTANA_DTB
+,"AFE_LOOPBACK_TX"
+#endif
 };
 
 static SOC_ENUM_SINGLE_DECL(mm1_channel_mux,
@@ -9066,6 +9069,12 @@ static const struct snd_kcontrol_new mmul8_mixer_controls[] = {
 	MSM_BACKEND_DAI_QUAT_TDM_TX_3,
 	MSM_FRONTEND_DAI_MULTIMEDIA8, 1, 0, msm_routing_get_audio_mixer,
 	msm_routing_put_audio_mixer),
+#ifdef CONFIG_MONTANA_DTB
+	SOC_DOUBLE_EXT("AFE_LOOPBACK_TX", SND_SOC_NOPM,
+	MSM_BACKEND_DAI_AFE_LOOPBACK_TX,
+	MSM_FRONTEND_DAI_MULTIMEDIA8, 1, 0, msm_routing_get_audio_mixer,
+	msm_routing_put_audio_mixer),
+#endif
 	SOC_DOUBLE_EXT("QUIN_TDM_TX_0", SND_SOC_NOPM,
 	MSM_BACKEND_DAI_QUIN_TDM_TX_0,
 	MSM_FRONTEND_DAI_MULTIMEDIA8, 1, 0, msm_routing_get_audio_mixer,
@@ -17981,7 +17990,9 @@ static const struct snd_soc_dapm_route intercon[] = {
 	{"AUDIO_REF_EC_UL1 MUX", "TERT_MI2S_TX", "TERT_MI2S_TX"},
 	{"AUDIO_REF_EC_UL1 MUX", "QUAT_MI2S_TX", "QUAT_MI2S_TX"},
 	{"AUDIO_REF_EC_UL1 MUX", "SLIM_1_TX", "SLIMBUS_1_TX"},
+#ifndef CONFIG_MONTANA_DTB
 	{"AUDIO_REF_EC_UL1 MUX", "PRI_TDM_TX_3", "PRI_TDM_TX_3"},
+#endif
 	{"AUDIO_REF_EC_UL1 MUX", "QUAT_TDM_TX_1", "QUAT_TDM_TX_1"},
 	{"AUDIO_REF_EC_UL1 MUX", "QUAT_TDM_RX_0", "QUAT_TDM_RX_0"},
 	{"AUDIO_REF_EC_UL1 MUX", "QUAT_TDM_RX_1", "QUAT_TDM_RX_1"},
@@ -18017,7 +18028,11 @@ static const struct snd_soc_dapm_route intercon[] = {
 	{"AUDIO_REF_EC_UL8 MUX", "SEC_MI2S_TX", "SEC_MI2S_TX"},
 	{"AUDIO_REF_EC_UL8 MUX", "TERT_MI2S_TX", "TERT_MI2S_TX"},
 	{"AUDIO_REF_EC_UL8 MUX", "QUAT_MI2S_TX", "QUAT_MI2S_TX"},
+#ifdef CONFIG_MONTANA_DTB
+	{"AUDIO_REF_EC_UL8 MUX", "QUIN_MI2S_TX" , "QUIN_MI2S_TX"},
+#else
 	{"AUDIO_REF_EC_UL8 MUX", "PRI_TDM_TX_3", "PRI_TDM_TX_3"},
+#endif
 
 	{"AUDIO_REF_EC_UL9 MUX", "PRI_MI2S_TX", "PRI_MI2S_TX"},
 	{"AUDIO_REF_EC_UL9 MUX", "SEC_MI2S_TX", "SEC_MI2S_TX"},
