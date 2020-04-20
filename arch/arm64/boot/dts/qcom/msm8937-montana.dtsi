@@ -42,7 +42,6 @@
 };
 
 &soc {
-
 	android_usb: android_usb@086000c8 {
 		compatible = "qcom,android-usb";
 		reg = <0x086000c8 0xc8>;
@@ -91,13 +90,15 @@
 		dma-names = "tx", "rx";
 	};
 
-
 	qcom,msm-thermal {
 		qcom,config-info = "montana";
 	};
 };
 
 &i2c_2 {
+	/delete-node/ adv7533@39;
+	/delete-node/ pericom-type-c@1d;
+
 	liteon@23 {
 		compatible = "liteon,ltr559";
 		reg = <0x23>;
@@ -175,6 +176,7 @@
 
 		config {
 			pins = "gpio60";
+			/delete-property/ output-high;
 		};
 	};
 
@@ -226,6 +228,7 @@
 
 &spmi_bus {
 	qcom,pmi8950@2 {
+		/delete-node/ qcom,leds@a100;
 
 		qcom,leds@1000 {
 			status = "ok";
@@ -237,7 +240,10 @@
 	};
 };
 
-&tlmm{
+&tlmm {
+	/delete-node/ pri-tlmm-lines;
+	/deltet-node/ spi7;
+
 	pmx_nfc_irq {
 		pins = "gpio9";
 		qcom,pin-func = <0>;
@@ -356,7 +362,6 @@
 &qcom_seecom {
 	/delete-property/ qcom,commonlib64-loaded-by-uefi;
 	qcom,appsbl-qseecom-support;
-
 };
 
 &qcom_rng {
