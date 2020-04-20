@@ -146,6 +146,7 @@
 
 		/delete-property/ asoc-wsa-codec-names;
 		/delete-property/ asoc-wsa-codec-prefixes;
+		/delete-property/ qcom,hdmi-dba-codec-rx;
 	};
 
 	ospl {
