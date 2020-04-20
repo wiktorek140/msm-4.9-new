@@ -10,7 +10,7 @@
  * GNU General Public License for more details.
  */
 
-#include "msm8937-moto-common-overlay.dtsi"
+#include "msm8937-moto-common-cedric-montana.dtsi"
 #include "dsi-panel-mot-tianma-521-1080p-video.dtsi"
 #include "dsi-panel-mot-inx-521-1080p-video.dtsi"
 #include "msm8937-camera-sensor-mot-montana.dtsi"
@@ -46,15 +46,6 @@
 		compatible = "qcom,android-usb";
 		reg = <0x086000c8 0xc8>;
 		qcom,pm-qos-latency = <2 1001 12701>;
-	};
-
-	vdda_touch_vreg: vdda_touch_vreg {
-		compatible = "regulator-fixed";
-		regulator-name = "vdda_touch";
-		gpio = <&tlmm 59 0>;
-		startup-delay-us = <300>;
-		enable-active-high;
-		regulator-always-on;
 	};
 
 	dummy_vreg: dummy_vreg {
@@ -96,9 +87,6 @@
 };
 
 &i2c_2 {
-	/delete-node/ adv7533@39;
-	/delete-node/ pericom-type-c@1d;
-
 	liteon@23 {
 		compatible = "liteon,ltr559";
 		reg = <0x23>;
@@ -168,81 +156,16 @@
 	regulator-boot-on;
 };
 
-&pmx_mdss {
-	mdss_dsi_active {
-		mux {
-			pins = "gpio60";
-		};
-
-		config {
-			pins = "gpio60";
-			/delete-property/ output-high;
-		};
-	};
-
-	mdss_dsi_suspend {
-		mux {
-			pins = "gpio60";
-		};
-
-		config {
-			pins = "gpio60";
-		};
-	};
-};
-
-&pm8937_l6 {
-	regulator-always-on;
-	regulator-boot-on;
-};
-
 &mdss_dsi0 {
 	qcom,dsi-pref-prim-pan = <&mot_tianma_521_1080p_vid_v0>;
-	vddio_disp-supply = <&pm8937_l6>;
-	vsp_disp-supply = <&lab_regulator>;
-	vsn_disp-supply = <&ibb_regulator>;
-
-	pinctrl-names = "mdss_default", "mdss_sleep";
-	pinctrl-0 = <&mdss_dsi_active>;
-	pinctrl-1 = <&mdss_dsi_suspend>;
-
-	qcom,platform-reset-gpio = <&tlmm 60 0>;
-};
-
-/* display boost and inverting boost regulators */
-&labibb {
-	status = "ok";
-	qpnp,qpnp-labibb-mode = "lcd";
-};
-
-&ibb_regulator {
-	qcom,qpnp-ibb-discharge-resistor = <32>;
 };
 
 &wled {
-	qcom,fs-curr-ua = <25000>;
-	qcom,cons-sync-write-delay-us = <1000>;
 	qcom,led-strings-list = [00 01 02];
-	qcom,en-cabc;
-};
-
-&spmi_bus {
-	qcom,pmi8950@2 {
-		/delete-node/ qcom,leds@a100;
-
-		qcom,leds@1000 {
-			status = "ok";
-			reg = <0x1000 0x100>;
-			compatible = "qcom,leds-atc";
-			linux,name = "charging";
-			qcom,ctrl-reg = <0x243>;
-		};
-	};
 };
 
 &tlmm {
-	/delete-node/ pri-tlmm-lines;
-	/deltet-node/ spi7;
+	/delete-node/ spi7;
 
 	pmx_nfc_irq {
 		pins = "gpio9";
@@ -292,7 +215,6 @@
 	qcom,fastchg-current-ma = <3000>;
 	qcom,chg-thermal-mitigation = <3000>, <2500>, <2000>, <1600>,
 		<1000>, <500>, <300>;
-	/delete-property/ qcom,dc-thermal-mitigation;
 	qcom,parallel-charge-current-map = <3000 3000 0>,
 					   <2500 2500 0>,
 					   <2000 2000 0>,
@@ -303,7 +225,6 @@
 	qcom,stepchg-voltage-mv = <4200>;
 	qcom,stepchg-current-ma = <2000>;
 	qcom,stepchg-taper-ma = <1800>;
-	qcom,stepchg-iterm-ma = <125>;
 	qcom,temp-warm-current-ma = <1500>;
 	qcom,temp-cool-current-ma = <600>;
 	qcom,temp-slightly-cool-current-ma = <600>;
@@ -314,7 +235,6 @@
 };
 
 &qpnp_fg {
-	qcom,ext-sense-type; /* External Sense Resistor */
 	qcom,thermal-coefficients =  /bits/ 16 <0xb785 0xb249 0x7135>;
 	qcom,low-batt-temp-comp;
 };
@@ -366,4 +286,8 @@
 
 &qcom_rng {
 	status = "okay";
+};
+
+&vdda_touch_vreg {
+	regulator-always-on;
 };
