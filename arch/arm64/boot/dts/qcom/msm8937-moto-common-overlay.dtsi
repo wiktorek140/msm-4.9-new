@@ -193,7 +193,7 @@
 &soc {
 	/delete-node/ spi@78b7000;
 	/delete-node/ sound-9335;
-	/delete-node/ i2c@7af5000
+	/delete-node/ i2c@7af5000;
 
 	alsa_to_h2w {
 		compatible = "mmi,alsa-to-h2w";
