@@ -1480,7 +1480,7 @@ static int msm8952_enable_cs35l35_mclk(struct snd_soc_card *card, bool enable)
 	mutex_lock(&l35_mclk_mutex);
 	if (enable) {
 		if (!atomic_read(&l35_mclk_rsc_ref)) {
-			pr_debug("%s: going to enable afe clock for cs35l35\n",
+			pr_err("%s: going to enable afe clock for cs35l35\n",
 				__func__);
 			l35_ana_clk.enable = true;
 			l35_ana_clk.clk_freq_in_hz = Q6AFE_LPASS_OSR_CLK_12_P288_MHZ;
@@ -1498,7 +1498,7 @@ static int msm8952_enable_cs35l35_mclk(struct snd_soc_card *card, bool enable)
 		if (!atomic_read(&l35_mclk_rsc_ref))
 			goto done;
 		if (!atomic_dec_return(&l35_mclk_rsc_ref)) {
-			pr_debug("%s: going to disable afe clock for cs35l35\n",
+			pr_err("%s: going to disable afe clock for cs35l35\n",
 				__func__);
 			l35_ana_clk.enable = false;
 			ret = afe_set_lpass_clock_v2(
@@ -1540,6 +1540,7 @@ static int msm_quin_mi2s_snd_startup(struct snd_pcm_substream *substream)
 		val = val | 0x00000001;
 		iowrite32(val, pdata->vaddr_gpio_mux_quin_ctl);
 	} else {
+		pr_err("failed to vaddr_gpio_mux_quin_ctl\n");
 		return -EINVAL;
 	}
 	ret = msm_mi2s_sclk_ctl(substream, true);
@@ -1556,7 +1557,7 @@ static int msm_quin_mi2s_snd_startup(struct snd_pcm_substream *substream)
 		goto err;
 	}
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
-		pr_debug("%s, going to enable cs35l35_mclk\n", __func__);
+		pr_err("%s, going to enable cs35l35_mclk\n", __func__);
 		ret = msm8952_enable_cs35l35_mclk(card, true);
 		if (ret < 0) {
 			pr_err("%s: failed to enable mclk for cs35l35 %d\n",
@@ -1799,6 +1800,8 @@ static int cs35l35_dai_init(struct snd_soc_pcm_runtime *rtd)
 		pr_err("%s: set dai_sysclk failed, err:%d\n",
 			__func__, ret);
 #ifdef CONFIG_SND_SOC_OPALUM
+	pr_err("%s: Pre init ospl2xx! Here I am.\n",
+			__func__);
 	ret = ospl2xx_init(rtd);
 	if (ret != 0)
 		pr_err("%s Cannot set Opalum controls %d\n", __func__, ret);

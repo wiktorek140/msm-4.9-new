@@ -67,9 +67,9 @@ static void ospl2xx_load_config(struct work_struct *work)
 		if (ret ||
 		    ospl2xx_config[i]->data == NULL ||
 		    ospl2xx_config[i]->size <= 0) {
-			pr_debug("failed to load config[%d], ret=%d\n", i, ret);
+			pr_err("failed to load config[%d], ret=%d\n", i, ret);
 		} else {
-			pr_debug("loading external configuration %s\n",
+			pr_err("loading external configuration %s\n",
 				ospl2xx_ext_config_tables[i]);
 			ext_config_loaded = 1;
 		}
@@ -1227,11 +1227,14 @@ int ospl2xx_init(struct snd_soc_pcm_runtime *rtd)
 	}
 
 	ospl2xx_wq = create_singlethread_workqueue("ospl2xx");
-	if (ospl2xx_wq == NULL)
+	if (ospl2xx_wq == NULL) {
+		pr_err("%s: cannot create single-thread workqueue\n", __func__);
 		return -ENOMEM;
-
+	}
 	INIT_WORK(&ospl2xx_init_work, ospl2xx_load_config);
 	queue_work(ospl2xx_wq, &ospl2xx_init_work);
+
+	pr_err("%s: finished sucessfuly (i think)\n", __func__);
 
 	return 0;
 }
@@ -1295,6 +1298,7 @@ static int ospl2xx_probe(struct platform_device *pdev)
 	ospl_passive_f0 = of_property_read_bool(pdev->dev.of_node,
 					"mmi,ospl-passive-f0");
 
+	pr_err("%s: probed successfuly\n",__func__);
 err:
 	spdev = pdev;
 	return ret;
