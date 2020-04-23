@@ -378,7 +378,16 @@ static int32_t afe_callback(struct apr_client_data *data, void *priv)
 	afe_callback_debug_print(data);
 	if (data->opcode == AFE_PORT_CMDRSP_GET_PARAM_V2) {
 		uint32_t *payload = data->payload;
+#if defined(CONFIG_SND_SOC_OPALUM)
+		int32_t *payload32 = data->payload;
 
+		if (payload32[1] == AFE_CUSTOM_OPALUM_RX_MODULE ||
+		    payload32[1] == AFE_CUSTOM_OPALUM_TX_MODULE) {
+			if (ospl2xx_callback != NULL)
+				ospl2xx_callback(data);
+			atomic_set(&this_afe.state, 0);
+		} else {
+#endif
 		if (!payload || (data->token >= AFE_MAX_PORTS)) {
 			pr_err("%s: Error: size %d payload %pK token %d\n",
 				__func__, data->payload_size,
@@ -399,20 +408,6 @@ static int32_t afe_callback(struct apr_client_data *data, void *priv)
 		if (payload[2] == AFE_PARAM_ID_DEV_TIMING_STATS) {
 			av_dev_drift_afe_cb_handler(data->payload,
 						    data->payload_size);
-#if defined(CONFIG_SND_SOC_TAS2560)
-		} else if ((payload[1] == AFE_TAS2560_ALGO_MODULE_RX) ||
-			   (payload[1] == AFE_TAS2560_ALGO_MODULE_TX)) {
-			if (tas2560_algo_callback != NULL)
-				tas2560_algo_callback(data);
-			atomic_set(&this_afe.state, 0);
-#endif
-#ifdef CONFIG_SND_SOC_OPALUM
-		} else if (payload[1] == AFE_CUSTOM_OPALUM_RX_MODULE ||
-			   payload[1] == AFE_CUSTOM_OPALUM_TX_MODULE) {
-				if (ospl2xx_callback != NULL)
-					ospl2xx_callback(data);
-				atomic_set(&this_afe.state, 0);
-#endif
 		} else {
 			if (sp_make_afe_callback(data->payload,
 						 data->payload_size))
@@ -422,6 +417,9 @@ static int32_t afe_callback(struct apr_client_data *data, void *priv)
 			wake_up(&this_afe.wait[data->token]);
 		else
 			return -EINVAL;
+#if defined(CONFIG_SND_SOC_OPALUM)
+		}
+#endif
 	} else if (data->payload_size) {
 		uint32_t *payload;
 		uint16_t port_id = 0;
