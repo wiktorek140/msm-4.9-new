@@ -92,6 +92,7 @@ static const char *const sidetone_afe_rx_text[] = {
 	"SLIM_RX", "PRI_MI2S_RX", "SEC_MI2S_RX"
 };
 static const char *const sidetone_enable_text[] = {"Off", "On"};
+static int topology_id_force = NULL_COPP_TOPOLOGY;
 
 #define WEIGHT_0_DB 0x4000
 /* all the FEs which can support channel mixer */
@@ -1097,6 +1098,11 @@ static int msm_routing_get_adm_topology(int fedai_id, int session_type,
 			topology = NULL_COPP_TOPOLOGY;
 	}
 done:
+	if (topology_id_force != NULL_COPP_TOPOLOGY) {
+		pr_debug("%s: Forcing topology %d\n", __func__,
+			topology_id_force);
+		topology = topology_id_force;
+	}
 	pr_debug("%s: Using topology %d\n", __func__, topology);
 	return topology;
 }
@@ -15228,6 +15234,39 @@ static const struct snd_kcontrol_new int4_mi2s_rx_vi_fb_stereo_ch_mux =
 	int4_mi2s_rx_vi_fb_stereo_ch_mux_enum, spkr_prot_get_vi_rch_port,
 	spkr_prot_put_vi_rch_port);
 
+static int msm_routing_get_force_adm_topology(
+					struct snd_kcontrol *kcontrol,
+					struct snd_ctl_elem_value *ucontrol)
+{
+	ucontrol->value.integer.value[0] = topology_id_force;
+
+	return 0;
+}
+
+static int msm_routing_put_force_adm_topology(
+					struct snd_kcontrol *kcontrol,
+					struct snd_ctl_elem_value *ucontrol)
+{
+	int topo = ucontrol->value.integer.value[0];
+
+	if (topo > 0) {
+		topology_id_force = ucontrol->value.integer.value[0];
+		pr_debug("%s force topology 0x%x", __func__, topo);
+	} else {
+		topology_id_force = NULL_COPP_TOPOLOGY;
+		pr_debug("%s clear force topology", __func__);
+	}
+
+	return 0;
+}
+
+static const struct snd_kcontrol_new adm_topology_controls[] = {
+	SOC_SINGLE_EXT("Set Adm Topology", SND_SOC_NOPM,
+	0, 0x7FFFFFFF, 0,
+	msm_routing_get_force_adm_topology,
+	msm_routing_put_force_adm_topology),
+};
+
 static const struct snd_soc_dapm_widget msm_qdsp6_widgets[] = {
 	/* Frontend AIF */
 	/* Widget name equals to Front-End DAI name<Need confirmation>,
@@ -20051,6 +20090,10 @@ static int msm_routing_probe(struct snd_soc_platform *platform)
 #ifdef CONFIG_CIRRUS_PLAYBACK
 	msm_crus_pb_add_controls(platform);
 #endif
+
+	snd_soc_add_platform_controls(platform,
+			adm_topology_controls,
+			ARRAY_SIZE(adm_topology_controls));
 
 	return 0;
 }
