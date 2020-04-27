@@ -1,6 +1,6 @@
 /*
  * leds-atc - Simple driver to control ATC led on a Qualcomm PMIC
- * Copyright (c) 2015, MMI. All rights reserved.
+ * Copyright (c) 2015-2019, MMI. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -13,6 +13,7 @@
  */
 
 #include <linux/kernel.h>
+#include <linux/regmap.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/slab.h>
@@ -21,7 +22,7 @@
 #include <linux/of_platform.h>
 #include <linux/of_device.h>
 #include <linux/spmi.h>
-#include <linux/regmap.h>
+#include <linux/platform_device.h>
 
 #define LED_CFG_MASK	0x06
 #define LED_CFG_SHIFT   1
@@ -30,13 +31,13 @@
 
 /**
  * @led_classdev - led class device
- * @spmi_device - spmi class device
+ * @platform_device - platform class device
  * @addr - spmi address for control register
  */
 struct atc_led_data {
 	struct led_classdev	cdev;
-	struct platform_device	*pdev;
-	struct regmap		*regmap;
+	struct platform_device *pdev;
+	struct regmap *regmap;
 	u32			addr;
 };
 
@@ -78,12 +79,31 @@ static int atc_leds_probe(struct platform_device *pdev)
 {
 	struct atc_led_data *led;
 	struct device_node *node;
+	unsigned int base;
+	u32 offset;
 	int rc;
-	uint reg;
+	uint val_reg;
 
 	node = pdev->dev.of_node;
-	if (node == NULL)
+	if (node == NULL) {
+		dev_err(&pdev->dev, "No atc led defined\n");
 		return -ENODEV;
+	}
+
+	rc = of_property_read_u32(node, "reg", &base);
+	if (rc < 0) {
+		dev_err(&pdev->dev,
+			"Couldn't find reg in node = %s rc = %d\n",
+			pdev->dev.of_node->full_name, rc);
+		return rc;
+	}
+
+	rc = of_property_read_u32(node, "qcom,ctrl-reg", &offset);
+	if (rc < 0) {
+		dev_err(&pdev->dev,
+			"Failure reading ctrl-reg, rc = %d\n", rc);
+		return rc;
+	}
 
 	led = devm_kzalloc(&pdev->dev, sizeof(struct atc_led_data), GFP_KERNEL);
 	if (!led) {
@@ -91,20 +111,14 @@ static int atc_leds_probe(struct platform_device *pdev)
 		return -ENOMEM;
 	}
 
-	led->pdev = pdev;
-
 	led->regmap = dev_get_regmap(pdev->dev.parent, NULL);
 	if (!led->regmap) {
 		dev_err(&pdev->dev, "Couldn't get parent's regmap\n");
 		return -EINVAL;
 	}
 
-	rc = of_property_read_u32(node, "qcom,ctrl-reg", &led->addr);
-	if (rc < 0) {
-		dev_err(&pdev->dev,
-			"Failure reading ctrl offset, rc = %d\n", rc);
-		return -ENODEV;
-	}
+	led->pdev = pdev;
+	led->addr = base + offset;
 
 	rc = of_property_read_string(node, "linux,name", &led->cdev.name);
 	if (rc < 0) {
@@ -113,15 +127,18 @@ static int atc_leds_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
-	rc = regmap_read(led->regmap, led->addr, &reg);
-	if (rc) {
-		dev_err(&pdev->dev, "read reg failed(%d)\n", rc);
+	dev_info(&pdev->dev, "atc_leds_probe, addr=%#x \n", led->addr);
+
+	rc = regmap_read(led->regmap, led->addr, &val_reg);
+	if (rc < 0) {
+		dev_err(&pdev->dev,
+			"Error reading address: %x(%d)\n", led->addr, rc);
 		return rc;
 	}
 
 	led->cdev.brightness_set = atc_led_set;
 	led->cdev.brightness_get = atc_led_get;
-	led->cdev.brightness = (reg & LED_CFG_MASK) >> LED_CFG_SHIFT;
+	led->cdev.brightness = (val_reg & LED_CFG_MASK) >> LED_CFG_SHIFT;
 	led->cdev.max_brightness = LED_ON;
 
 	rc = led_classdev_register(&pdev->dev, &led->cdev);
