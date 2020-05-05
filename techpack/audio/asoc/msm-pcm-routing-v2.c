@@ -4007,6 +4007,9 @@ static int msm_routing_ext_ec_get(struct snd_kcontrol *kcontrol,
 	case AFE_PORT_ID_QUATERNARY_MI2S_TX:
 		ucontrol->value.integer.value[0] = EXT_EC_REF_QUAT_MI2S_TX;
 		break;
+	case AFE_PORT_ID_QUINARY_MI2S_TX:
+		ucontrol->value.integer.value[0] = EXT_EC_REF_QUIN_MI2S_TX;
+		break;
 	case SLIMBUS_1_TX:
 		ucontrol->value.integer.value[0] = EXT_EC_REF_SLIM_1_TX;
 		break;
