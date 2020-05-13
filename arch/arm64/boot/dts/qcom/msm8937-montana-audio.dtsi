@@ -11,6 +11,10 @@
  * GNU General Public License for more details.
  */
 
+&dai_mi2s4 {
+	qcom,msm-dai-q6-mi2s-dev-id = <5>;
+};
+
 &soc {
 	/delete-node/ wsa881x_analog_clk_pctrl;
 
