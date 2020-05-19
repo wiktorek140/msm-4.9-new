@@ -1018,6 +1018,8 @@ static void msm_anlg_cdc_boost_on(struct snd_soc_codec *codec)
 		/* Wait for 500us after BOOST pulse_skip */
 		usleep_range(500, 510);
 	}
+	if (sdm660_cdc->boost_pdm_clk)
+		snd_soc_write(codec, MSM89XX_PMIC_ANALOG_BOOST_TEST_2, 0x4);
 }
 
 static void msm_anlg_cdc_boost_off(struct snd_soc_codec *codec)
@@ -1263,6 +1265,12 @@ static void msm_anlg_cdc_dt_parse_boost_info(struct snd_soc_codec *codec)
 		snd_soc_codec_get_drvdata(codec);
 	const char *prop_name = "qcom,cdc-boost-voltage";
 	int boost_voltage, ret;
+
+	sdm660_cdc_priv->boost_pdm_clk =
+		of_property_read_bool(codec->dev->of_node,
+			"qcom,cdc-boost-pdm-clk");
+	dev_info(codec->dev, "Boost clk source: %s\n",
+		sdm660_cdc_priv->boost_pdm_clk ? "pdm_clk" : "default");
 
 	ret = of_property_read_u32(codec->dev->of_node, prop_name,
 			&boost_voltage);
