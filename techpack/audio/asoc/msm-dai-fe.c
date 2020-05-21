@@ -2536,6 +2536,7 @@ static struct snd_soc_dai_driver msm_fe_dais[] = {
 		.name = "MultiMedia19",
 		.probe = fe_dai_probe,
 	},
+#ifndef CONFIG_MONTANA_DTB
 	{
 		.playback = {
 			.stream_name = "MultiMedia20 Playback",
@@ -2569,6 +2570,7 @@ static struct snd_soc_dai_driver msm_fe_dais[] = {
 		.name = "MultiMedia20",
 		.probe = fe_dai_probe,
 	},
+#endif
 	{
 		.capture = {
 		.stream_name = "MultiMedia28 Capture",
