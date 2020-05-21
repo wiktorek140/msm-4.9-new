@@ -378,7 +378,7 @@ static int32_t afe_callback(struct apr_client_data *data, void *priv)
 	afe_callback_debug_print(data);
 	if (data->opcode == AFE_PORT_CMDRSP_GET_PARAM_V2) {
 		uint32_t *payload = data->payload;
-#if defined(CONFIG_SND_SOC_OPALUM)
+#ifdef CONFIG_SND_SOC_OPALUM
 		int32_t *payload32 = data->payload;
 
 		if (payload32[1] == AFE_CUSTOM_OPALUM_RX_MODULE ||
@@ -417,7 +417,7 @@ static int32_t afe_callback(struct apr_client_data *data, void *priv)
 			wake_up(&this_afe.wait[data->token]);
 		else
 			return -EINVAL;
-#if defined(CONFIG_SND_SOC_OPALUM)
+#ifdef CONFIG_SND_SOC_OPALUM
 		}
 #endif
 	} else if (data->payload_size) {
@@ -4185,7 +4185,7 @@ int afe_get_port_index(u16 port_id)
 	}
 }
 
-#if defined (CONFIG_SND_SOC_OPALUM)
+#ifdef CONFIG_SND_SOC_OPALUM
 EXPORT_SYMBOL(afe_get_port_index);
 #endif
 
