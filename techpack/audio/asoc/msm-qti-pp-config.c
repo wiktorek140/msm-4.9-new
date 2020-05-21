@@ -27,7 +27,7 @@
 
 /* EQUALIZER */
 /* Equal to Frontend after last of the MULTIMEDIA SESSIONS */
-#define MAX_EQ_SESSIONS		(MSM_FRONTEND_DAI_MULTIMEDIA20 + 1)
+#define MAX_EQ_SESSIONS		(MSM_FRONTEND_DAI_VOIP)
 
 enum {
 	EQ_BAND1 = 0,
