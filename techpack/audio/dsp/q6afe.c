@@ -204,15 +204,15 @@ static void afe_callback_debug_print(struct apr_client_data *data)
 	payload = data->payload;
 
 	if (data->payload_size >= 8)
-		pr_debug("%s: code = 0x%x PL#0[0x%x], PL#1[0x%x], size = %d\n",
+		pr_err("%s: code = 0x%x PL#0[0x%x], PL#1[0x%x], size = %d\n",
 			__func__, data->opcode, payload[0], payload[1],
 			data->payload_size);
 	else if (data->payload_size >= 4)
-		pr_debug("%s: code = 0x%x PL#0[0x%x], size = %d\n",
+		pr_err("%s: code = 0x%x PL#0[0x%x], size = %d\n",
 			__func__, data->opcode, payload[0],
 			data->payload_size);
 	else
-		pr_debug("%s: code = 0x%x, size = %d\n",
+		pr_err("%s: code = 0x%x, size = %d\n",
 			__func__, data->opcode, data->payload_size);
 }
 
