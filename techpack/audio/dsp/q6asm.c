@@ -1115,12 +1115,14 @@ void q6asm_audio_client_free(struct audio_client *ac)
 	}
 
 	rtac_set_asm_handle(ac->session, NULL);
-	apr_deregister(ac->apr2);
-	apr_deregister(ac->apr);
-	q6asm_mmap_apr_dereg();
-	ac->apr2 = NULL;
-	ac->apr = NULL;
-	ac->mmap_apr = NULL;
+	if (!atomic_read(&ac->reset)) {
+		apr_deregister(ac->apr2);
+		apr_deregister(ac->apr);
+		q6asm_mmap_apr_dereg();
+		ac->apr2 = NULL;
+		ac->apr = NULL;
+		ac->mmap_apr = NULL;
+	}
 	q6asm_session_free(ac);
 
 	pr_debug("%s: APR De-Register\n", __func__);
