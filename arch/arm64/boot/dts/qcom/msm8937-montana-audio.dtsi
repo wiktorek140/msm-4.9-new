@@ -41,7 +41,6 @@
 		qcom,msm-mbhc-gnd-swh = <0>;
 		qcom,msm-hs-micbias-type = "internal";
 
-		qcom,cdc-us-eu-gpios = <&cdc_us_euro_sw>;
 		qcom,pri-mi2s-gpios = <&cdc_pri_mi2s_gpios>;
 		qcom,quin-mi2s-gpios = <&cdc_quin_mi2s_gpios>;
 		qcom,cs35l35-gpios = <&cdc_cs35l35_mclk>;
