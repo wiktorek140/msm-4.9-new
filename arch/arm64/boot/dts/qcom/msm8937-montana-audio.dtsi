@@ -15,6 +15,26 @@
 	qcom,msm-dai-q6-mi2s-dev-id = <5>;
 };
 
+&dai_pri_auxpcm {
+    /delete-property/ qcom,msm-cpudai-afe-clk-ver;
+};
+
+&dai_sec_auxpcm {
+    /delete-property/ qcom,msm-cpudai-afe-clk-ver;
+};
+
+&dai_tert_auxpcm {
+    /delete-property/ qcom,msm-cpudai-afe-clk-ver;
+};
+
+&dai_quat_auxpcm {
+    /delete-property/ qcom,msm-cpudai-afe-clk-ver;
+};
+
+&dai_quin_auxpcm {
+    /delete-property/ qcom,msm-cpudai-afe-clk-ver;
+};
+
 &soc {
 	/delete-node/ wsa881x_analog_clk_pctrl;
 
