@@ -43,7 +43,6 @@
 
 #define MSM_INT_DIGITAL_CODEC "msm-dig-codec"
 #define PMIC_INT_ANALOG_CODEC "analog-codec"
-#define PMIC_INT_CAJON_CODEC "cajon_codec"
 
 #if !IS_ENABLED(CONFIG_SND_SOC_WSA881X_ANALOG)
 int wsa881x_get_probing_count(void) {
@@ -1843,17 +1842,6 @@ struct snd_soc_dai_link_component dlc_vifeed[] = {
 	{
 		.of_node = NULL,
 		.dai_name  = "msm_anlg_vifeedback",
-	},
-};
-
-struct snd_soc_dai_link_component cajon_vifeed[] = {
-	{
-		.of_node = NULL,
-		.dai_name = "cajon_codec",
-	},
-	{
-		.of_node = NULL,
-		.dai_name  = "cajon_vifeedback",
 	},
 };
 
