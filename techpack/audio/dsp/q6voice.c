@@ -38,6 +38,7 @@
 #define NUM_CHANNELS_STEREO 2
 #define NUM_CHANNELS_THREE 3
 #define NUM_CHANNELS_QUAD 4
+#define CVP_VERSION_1 1
 #define CVP_VERSION_2 2
 #define GAIN_Q14_FORMAT(a) (a << 14)
 
@@ -4356,6 +4357,11 @@ static int voice_get_avcs_version_per_service(uint32_t service_id)
 		return -EINVAL;
 	}
 
+#ifdef CONFIG_MONTANA_DTB
+	common.is_avcs_version_queried = true;
+	return CVP_VERSION_1;
+#else
+
 	ver_size = sizeof(struct avcs_get_fwk_version) +
 		   sizeof(struct avs_svc_api_info);
 	ver_info = kzalloc(ver_size, GFP_KERNEL);
@@ -4371,6 +4377,7 @@ static int voice_get_avcs_version_per_service(uint32_t service_id)
 done:
 	kfree(ver_info);
 	return ret;
+#endif
 }
 
 static void voice_mic_break_work_fn(struct work_struct *work)
