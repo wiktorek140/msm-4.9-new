@@ -4360,7 +4360,7 @@ static int voice_get_avcs_version_per_service(uint32_t service_id)
 #ifdef CONFIG_MONTANA_DTB
 	common.is_avcs_version_queried = true;
 	return CVP_VERSION_1;
-#else
+#endif
 
 	ver_size = sizeof(struct avcs_get_fwk_version) +
 		   sizeof(struct avs_svc_api_info);
@@ -4377,7 +4377,6 @@ static int voice_get_avcs_version_per_service(uint32_t service_id)
 done:
 	kfree(ver_info);
 	return ret;
-#endif
 }
 
 static void voice_mic_break_work_fn(struct work_struct *work)

@@ -1161,6 +1161,8 @@ static int msm_mi2s_snd_startup(struct snd_pcm_substream *substream)
 	struct snd_soc_card *card = rtd->card;
 	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
 	struct msm_asoc_mach_data *pdata = snd_soc_card_get_drvdata(card);
+    struct snd_soc_codec *dig_cdc = rtd->codec_dais[DIG_CDC]->codec;
+    struct snd_soc_codec *ana_cdc = rtd->codec_dais[ANA_CDC]->codec;
 	int ret = 0, val = 0;
 
 	pr_debug("%s(): substream = %s  stream = %d\n", __func__,
@@ -1202,6 +1204,23 @@ static int msm_mi2s_snd_startup(struct snd_pcm_substream *substream)
 			return ret;
 		}
 	}
+#ifdef CONFIG_MONTANA_DTB
+    ret =  msm8952_enable_dig_cdc_clk(dig_cdc, 1, true);
+	if (ret < 0) {
+		pr_err("failed to enable mclk\n");
+		return ret;
+	}
+	/* Enable the codec mclk config */
+	//ret = msm_gpioset_activate(CLIENT_WCD_INT, "pri_i2s");
+    ret = msm_cdc_pinctrl_select_active_state(pdata->mi2s_gpio_p[PRIM_MI2S]);
+	if (ret < 0) {
+		pr_err("%s: gpio set cannot be activated %sd",
+				__func__, "pri_i2s");
+		return ret;
+	}
+	msm_anlg_cdc_mclk_enable(ana_cdc, 1, true);
+#endif
+
 	ret = snd_soc_dai_set_fmt(cpu_dai, SND_SOC_DAIFMT_CBS_CFS);
 	if (ret < 0)
 		pr_err("%s: set fmt cpu dai failed; ret=%d\n", __func__, ret);
@@ -1641,7 +1660,7 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 		return NULL;
 
 #define S(X, Y) ((WCD_MBHC_CAL_PLUG_TYPE_PTR(msm8952_wcd_cal)->X) = (Y))
-	S(v_hs_max, 1500);
+	S(v_hs_max, 1700);
 #undef S
 #define S(X, Y) ((WCD_MBHC_CAL_BTN_DET_PTR(msm8952_wcd_cal)->X) = (Y))
 	S(num_btn, WCD_MBHC_DEF_BUTTONS);
@@ -1664,10 +1683,10 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 	 * 210-290 == Button 2
 	 * 360-680 == Button 3
 	 */
-	btn_low[0] = 75;
-	btn_high[0] = 75;
-	btn_low[1] = 150;
-	btn_high[1] = 150;
+	btn_low[0] = 88;
+	btn_high[0] = 88;
+	btn_low[1] = 138;
+	btn_high[1] = 138;
 	btn_low[2] = 225;
 	btn_high[2] = 225;
 	btn_low[3] = 450;
@@ -1802,6 +1821,7 @@ static int cs35l35_dai_init(struct snd_soc_pcm_runtime *rtd)
 #endif
 	snd_soc_dapm_ignore_suspend(dapm, "AMP Playback");
 	snd_soc_dapm_ignore_suspend(dapm, "AMP Capture");
+    snd_soc_dapm_ignore_suspend(dapm, "SPK AMP Playback");
 	snd_soc_dapm_sync(dapm);
 	return ret;
 }
@@ -2774,7 +2794,7 @@ static struct snd_soc_dai_link msm8952_dai[] = {
 #endif
 		.be_hw_params_fixup = msm_be_hw_params_fixup,
 		.no_host_mode = SND_SOC_DAI_LINK_NO_HOST,
-		.ops = &msm8952_quin_mi2s_be_ops,
+		//.ops = &msm8952_quin_mi2s_be_ops,
 		.ignore_suspend = 1,
 		.id = MSM_BACKEND_DAI_QUINARY_MI2S_TX,
 	},
@@ -3138,7 +3158,7 @@ static struct snd_soc_card *msm8952_populate_sndcard_dailinks(
 				sizeof(msm8952_hdmi_dba_dai_link));
 		len1 += ARRAY_SIZE(msm8952_hdmi_dba_dai_link);
 	} else {
-		dev_dbg(dev, "%s(): No hdmi dba present, add quin dai\n",
+		dev_err(dev, "%s(): No hdmi dba present, add quin dai\n",
 				__func__);
 		memcpy(dailink + len1, msm8952_quin_dai_link,
 				sizeof(msm8952_quin_dai_link));
