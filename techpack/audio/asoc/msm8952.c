@@ -1498,8 +1498,6 @@ static int msm8952_enable_cs35l35_mclk(struct snd_soc_card *card, bool enable)
 	mutex_lock(&l35_mclk_mutex);
 	if (enable) {
 		if (!atomic_read(&l35_mclk_rsc_ref)) {
-			pr_debug("%s: going to enable afe clock for cs35l35\n",
-				__func__);
 			l35_ana_clk.enable = true;
 			l35_ana_clk.clk_freq_in_hz = Q6AFE_LPASS_OSR_CLK_12_P288_MHZ;
 			ret = afe_set_lpass_clock_v2(
@@ -1516,8 +1514,6 @@ static int msm8952_enable_cs35l35_mclk(struct snd_soc_card *card, bool enable)
 		if (!atomic_read(&l35_mclk_rsc_ref))
 			goto done;
 		if (!atomic_dec_return(&l35_mclk_rsc_ref)) {
-			pr_debug("%s: going to disable afe clock for cs35l35\n",
-				__func__);
 			l35_ana_clk.enable = false;
 			ret = afe_set_lpass_clock_v2(
 					AFE_PORT_ID_SECONDARY_MI2S_RX,
@@ -1573,7 +1569,6 @@ static int msm_quin_mi2s_snd_startup(struct snd_pcm_substream *substream)
 		goto err;
 	}
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
-		pr_debug("%s, going to enable cs35l35_mclk\n", __func__);
 		ret = msm8952_enable_cs35l35_mclk(card, true);
 		if (ret < 0) {
 			pr_err("%s: failed to enable mclk for cs35l35 %d\n",
@@ -1629,7 +1624,6 @@ static void msm_quin_mi2s_snd_shutdown(struct snd_pcm_substream *substream)
 	}
 #ifdef CONFIG_SND_SOC_CS35L35
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
-		pr_debug("%s, going to disable cs35l35 mclk\n", __func__);
 		ret = msm8952_enable_cs35l35_mclk(card, false);
 		if (ret < 0) {
 			pr_err("%s: failed to disable mclk for l35 %d\n",
@@ -1638,7 +1632,6 @@ static void msm_quin_mi2s_snd_shutdown(struct snd_pcm_substream *substream)
 		}
 	}
 
-	pr_debug("%s, going to de-activate cs35l35_clk\n", __func__);
 	ret = msm_cdc_pinctrl_select_sleep_state(pdata->mi2s_gpio_p[CS35L35]);
 	if (ret < 0) {
 		pr_err("%s: gpio set cannot be de-activated %s",
@@ -1821,7 +1814,6 @@ static int cs35l35_dai_init(struct snd_soc_pcm_runtime *rtd)
 #endif
 	snd_soc_dapm_ignore_suspend(dapm, "AMP Playback");
 	snd_soc_dapm_ignore_suspend(dapm, "AMP Capture");
-    snd_soc_dapm_ignore_suspend(dapm, "SPK AMP Playback");
 	snd_soc_dapm_sync(dapm);
 	return ret;
 }

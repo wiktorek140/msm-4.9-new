@@ -290,7 +290,7 @@
 	regulator-always-on;
 };
 
-/* only for Nougat bootloader 
-&apps_iommu {
+// only for Nougat bootloader 
+/*&apps_iommu {
 	qcom,no-aarch64;
 };*/ 
