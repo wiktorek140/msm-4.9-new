@@ -41,6 +41,13 @@
 };
 
 &soc {
+
+	android_usb: android_usb@086000c8 {
+		compatible = "qcom,android-usb";
+		reg = <0x086000c8 0xc8>;
+		qcom,pm-qos-latency = <2 1001 12701>;
+	};
+
 	vdda_touch_vreg: vdda_touch_vreg {
 		compatible = "regulator-fixed";
 		regulator-name = "vdda_touch";
