@@ -1,7 +1,7 @@
 # auto-detect subdirs
 ifeq ($(CONFIG_ARCH_MSM8937), y)
 include $(srctree)/techpack/audio/config/msm8937auto.conf
-export
+export $(shell sed 's/=.*//' $(srctree)/techpack/audio/config/msm8937auto.conf)
 endif
 ifeq ($(CONFIG_ARCH_SDM845), y)
 include $(srctree)/techpack/audio/config/sdm845auto.conf
