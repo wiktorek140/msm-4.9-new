@@ -16,23 +16,23 @@
 };
 
 &dai_pri_auxpcm {
-    /delete-property/ qcom,msm-cpudai-afe-clk-ver;
+	/delete-property/ qcom,msm-cpudai-afe-clk-ver;
 };
 
 &dai_sec_auxpcm {
-    /delete-property/ qcom,msm-cpudai-afe-clk-ver;
+	/delete-property/ qcom,msm-cpudai-afe-clk-ver;
 };
 
 &dai_tert_auxpcm {
-    /delete-property/ qcom,msm-cpudai-afe-clk-ver;
+	/delete-property/ qcom,msm-cpudai-afe-clk-ver;
 };
 
 &dai_quat_auxpcm {
-    /delete-property/ qcom,msm-cpudai-afe-clk-ver;
+	/delete-property/ qcom,msm-cpudai-afe-clk-ver;
 };
 
 &dai_quin_auxpcm {
-    /delete-property/ qcom,msm-cpudai-afe-clk-ver;
+	/delete-property/ qcom,msm-cpudai-afe-clk-ver;
 };
 
 &soc {
