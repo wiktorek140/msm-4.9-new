@@ -80,7 +80,7 @@
 		asoc-cpu = <&dai_pri_auxpcm>,
 			<&dai_mi2s0>, <&dai_mi2s1>,
 			<&dai_mi2s2>, <&dai_mi2s3>,
-			<&dai_mi2s4>, <&dai_mi2s6>,
+			<&dai_mi2s4>, <&dai_mi2s5>,
 			<&sb_0_rx>, <&sb_0_tx>, <&sb_1_rx>, <&sb_1_tx>,
 			<&sb_3_rx>, <&sb_3_tx>, <&sb_4_rx>, <&sb_4_tx>,
 			<&bt_sco_rx>, <&bt_sco_tx>,
@@ -105,13 +105,16 @@
 				"msm-dai-q6-dev.32771", "msm-dai-q6-dev.32772",
 				"msm-dai-q6-dev.32773", "msm-dai-q6-dev.32770";
 
-		asoc-codec = <&stub_codec>,  <&msm_digital_codec>, <&pmic_analog_codec>;
+		asoc-codec = <&stub_codec>, <&msm_digital_codec>, <&pmic_analog_codec>;
 		asoc-codec-names = "msm-stub-codec.1", "msm-dig-codec", "analog-codec";
 
 		msm-vdd-wsa-switch-supply = <&pm8937_l5>;
 		qcom,msm-vdd-wsa-switch-voltage = <1800000>;
 		qcom,msm-vdd-wsa-switch-current = <10000>;
 
+		/delete-property/ msm-vdd-wsa-switch-supply;
+		/delete-property/ qcom,msm-vdd-wsa-switch-voltage;
+		/delete-property/ qcom,msm-vdd-wsa-switch-current;
 		qcom,pinctrl-names =
 			"all_off",
 			"pri_i2s_act",
@@ -150,6 +153,7 @@
 		/delete-property/ asoc-wsa-codec-names;
 		/delete-property/ asoc-wsa-codec-prefixes;
 		/delete-property/ qcom,hdmi-dba-codec-rx;
+		/delete-property/ qcom,msm-dai-q6-hdmi;
 	};
 
 	ospl {
