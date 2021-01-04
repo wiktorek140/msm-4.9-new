@@ -151,3 +151,7 @@
 	/delete-property/ qcom,commonlib64-loaded-by-uefi;
 	qcom,appsbl-qseecom-support;
 };
+
+&apps_iommu {
+	qcom,no-aarch64;
+};
