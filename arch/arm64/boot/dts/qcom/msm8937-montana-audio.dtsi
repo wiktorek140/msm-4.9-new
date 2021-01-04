@@ -11,6 +11,10 @@
  * GNU General Public License for more details.
  */
 
+&dai_mi2s4 {
+	qcom,msm-dai-q6-mi2s-dev-id = <4>;
+};
+
 &dai_pri_auxpcm {
     /delete-property/ qcom,msm-cpudai-afe-clk-ver;
 };
