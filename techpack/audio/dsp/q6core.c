@@ -658,8 +658,8 @@ int q6core_get_avcs_api_version_per_service(uint32_t service_id)
 
         ret = q6core_get_avcs_fwk_version();
         if (ret < 0) {
-                pr_err("%s: failure in getting AVCS version\n", __func__);
-                return ret;
+                pr_err("%s: failure in getting AVCS version: %d\n", __func__, service_id);
+                return 1;
         }
 
         cached_ver_info = q6core_lcl.q6core_avcs_ver_info.ver_info;
