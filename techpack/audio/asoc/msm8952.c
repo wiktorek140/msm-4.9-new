@@ -1162,6 +1162,10 @@ static int msm_mi2s_snd_startup(struct snd_pcm_substream *substream)
 	struct snd_soc_card *card = rtd->card;
 	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
 	struct msm_asoc_mach_data *pdata = snd_soc_card_get_drvdata(card);
+#ifdef CONFIG_MONTANA_DTB
+	struct snd_soc_codec *dig_cdc = rtd->codec_dais[DIG_CDC]->codec;
+	struct snd_soc_codec *ana_cdc = rtd->codec_dais[ANA_CDC]->codec;
+#endif
 	int ret = 0, val = 0;
 
 	pr_debug("%s(): substream = %s  stream = %d\n", __func__,
@@ -1203,6 +1207,22 @@ static int msm_mi2s_snd_startup(struct snd_pcm_substream *substream)
 			return ret;
 		}
 	}
+#ifdef CONFIG_MONTANA_DTB
+	ret =  msm8952_enable_dig_cdc_clk(dig_cdc, 1, true);
+	if (ret < 0) {
+		pr_err("failed to enable mclk\n");
+		return ret;
+	}
+	/* Enable the codec mclk config */
+	ret = msm_cdc_pinctrl_select_active_state(pdata->mi2s_gpio_p[PRIM_MI2S]);
+	if (ret < 0) {
+		pr_err("%s: gpio set cannot be activated %sd",
+				__func__, "pri_i2s");
+		return ret;
+	}
+	msm_anlg_cdc_mclk_enable(ana_cdc, 1, true);
+#endif
+
 	ret = snd_soc_dai_set_fmt(cpu_dai, SND_SOC_DAIFMT_CBS_CFS);
 	if (ret < 0)
 		pr_err("%s: set fmt cpu dai failed; ret=%d\n", __func__, ret);
