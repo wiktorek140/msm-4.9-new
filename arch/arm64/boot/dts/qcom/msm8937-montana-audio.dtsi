@@ -21,8 +21,8 @@
 	cdc_cs35l35_mclk: wsa881x_analog_clk_pctrl {
 		compatible = "qcom,msm-cdc-pinctrl";
 		pinctrl-names = "aud_active", "aud_sleep";
-		pinctrl-0 = <&wsa_clk_on>;
-		pinctrl-1 = <&wsa_clk_off>;
+		pinctrl-0 = <&cs35l35_mclk_on>;
+		pinctrl-1 = <&cs35l35_mclk_off>;
 	};
 
 	int_codec: sound {
@@ -56,7 +56,7 @@
 		qcom,msm-gpios =
 			"pri_i2s",
 			"quin_i2s",
-			"wsa_clk";
+			"cs35l35_mclk";
 
 		qcom,audio-routing =
 			"RX_BIAS", "MCLK",
@@ -131,21 +131,21 @@
 			"cs35l35_mclk_quin_act",
 			"cs35l35_mclk_quin_pri_i2s_act";
 		pinctrl-0 = <&cdc_pdm_lines_sus &cdc_pdm_lines_2_sus
-			&pri_tlmm_lines_sus &pri_tlmm_ws_sus &wsa_clk_off>;
+			&pri_tlmm_lines_sus &pri_tlmm_ws_sus &cs35l35_mclk_off>;
 		pinctrl-1 = <&cdc_pdm_lines_act &cdc_pdm_lines_2_act
-			&pri_tlmm_lines_sus &pri_tlmm_ws_sus &wsa_clk_off>;
+			&pri_tlmm_lines_sus &pri_tlmm_ws_sus &cs35l35_mclk_off>;
 		pinctrl-2 = <&cdc_pdm_lines_sus &cdc_pdm_lines_2_sus
-			&pri_tlmm_lines_act &pri_tlmm_ws_act &wsa_clk_off>;
+			&pri_tlmm_lines_act &pri_tlmm_ws_act &cs35l35_mclk_off>;
 		pinctrl-3 = <&cdc_pdm_lines_act &cdc_pdm_lines_2_act
-			&pri_tlmm_lines_act &pri_tlmm_ws_act &wsa_clk_off>;
+			&pri_tlmm_lines_act &pri_tlmm_ws_act &cs35l35_mclk_off>;
 		pinctrl-4 = <&cdc_pdm_lines_sus &cdc_pdm_lines_2_sus
-			&pri_tlmm_lines_sus &pri_tlmm_ws_sus &wsa_clk_on>;
+			&pri_tlmm_lines_sus &pri_tlmm_ws_sus &cs35l35_mclk_on>;
 		pinctrl-5 = <&cdc_pdm_lines_act &cdc_pdm_lines_2_act
-			&pri_tlmm_lines_sus &pri_tlmm_ws_sus &wsa_clk_on>;
+			&pri_tlmm_lines_sus &pri_tlmm_ws_sus &cs35l35_mclk_on>;
 		pinctrl-6 = <&cdc_pdm_lines_sus &cdc_pdm_lines_2_sus
-			&pri_tlmm_lines_act &pri_tlmm_ws_act &wsa_clk_on>;
+			&pri_tlmm_lines_act &pri_tlmm_ws_act &cs35l35_mclk_on>;
 		pinctrl-7 = <&cdc_pdm_lines_act &cdc_pdm_lines_2_act
-			&pri_tlmm_lines_act &pri_tlmm_ws_act &wsa_clk_on>;
+			&pri_tlmm_lines_act &pri_tlmm_ws_act &cs35l35_mclk_on>;
 
 		/delete-property/ asoc-wsa-codec-names;
 		/delete-property/ asoc-wsa-codec-prefixes;
@@ -178,7 +178,7 @@
 };
 
 &tlmm {
-	cs35l35_reset_default: cs35l35_default{
+	cs35l35_reset_default: cs35l35_default {
 		mux {
 			pins = "gpio38";
 			function = "gpio";
