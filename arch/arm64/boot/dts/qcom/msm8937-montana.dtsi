@@ -289,3 +289,8 @@
 &vdda_touch_vreg {
 	regulator-always-on;
 };
+
+// only for Nougat bootloader 
+/*&apps_iommu {
+	qcom,no-aarch64;
+};*/ 
