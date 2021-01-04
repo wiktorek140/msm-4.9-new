@@ -115,6 +115,7 @@
 		/delete-property/ msm-vdd-wsa-switch-supply;
 		/delete-property/ qcom,msm-vdd-wsa-switch-voltage;
 		/delete-property/ qcom,msm-vdd-wsa-switch-current;
+
 		qcom,pinctrl-names =
 			"all_off",
 			"pri_i2s_act",
@@ -179,6 +180,10 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&cs35l35_irq_default &cs35l35_reset_default>;
 	};
+};
+
+&pmic_analog_codec {
+	qcom,cdc-vdd-pa-voltage = <2050000 2050000>;
 };
 
 &tlmm {
