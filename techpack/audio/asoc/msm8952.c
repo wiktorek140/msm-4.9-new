@@ -2787,7 +2787,7 @@ static struct snd_soc_dai_link msm8952_dai[] = {
 #endif
 		.be_hw_params_fixup = msm_be_hw_params_fixup,
 		.no_host_mode = SND_SOC_DAI_LINK_NO_HOST,
-		//.ops = &msm8952_quin_mi2s_be_ops,
+		.ops = &msm8952_quin_mi2s_be_ops,
 		.ignore_suspend = 1,
 		.id = MSM_BACKEND_DAI_QUINARY_MI2S_TX,
 	},
