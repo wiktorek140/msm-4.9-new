@@ -254,7 +254,8 @@
 };
 
 &pmi_haptic {
-	qcom,vmax-mv = <2580>;
+	qcom,vmax-mv = <2552>;
+    qcom,actuator-type = <1>;
 };
 
 &spi_4 { /* BLSP1 QUP4 */
