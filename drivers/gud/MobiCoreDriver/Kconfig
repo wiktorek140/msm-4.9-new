@@ -1,0 +1,5 @@
+config TEE_MOBICORE
+	tristate "MobiCore Driver"
+	depends on TEE
+	help
+	  Mobicore driver to comunicate with TEE.
