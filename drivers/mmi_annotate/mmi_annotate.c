@@ -26,6 +26,8 @@
 #include <linux/dma-contiguous.h>
 #include <linux/dma-mapping.h>
 #include <linux/mmi_annotate.h>
+#include <linux/seq_file.h>
+#include <linux/fs.h>
 
 #define MAX_USER_STR 1024
 #define DEFAULT_MEM_SIZE 4096
@@ -60,7 +62,7 @@ static int mmi_annotate_seq_show(struct seq_file *f, void *ptr)
 {
 	mutex_lock(&mem_lock);
 	if (mem_data.contents && mem_data.cur_off > 0) {
-		seq_printf(f, mem_data.contents);
+		seq_printf(f, "%s", mem_data.contents);
 	} else {
 		seq_printf(f, "No annotated data.\n");
 	}
@@ -128,11 +130,11 @@ static int mmi_annotate_probe(struct platform_device *pdev)
 	pdata->mem_size = resource_size(&res);
 	pdata->mem_address = res.start;
 
-	dev_info(dev, "size %lx", pdata->mem_size);
+	dev_info(dev, "size %zx", pdata->mem_size);
 	dev_info(dev, "addr %lx", (unsigned long)pdata->mem_address);
 
 	if (pdata->mem_size < sizeof(struct persist_data_t)) {
-		dev_err(dev, "Mem size too small %zx/%lu\n",
+		dev_err(dev, "Mem size too small %zx/%zd\n",
 				pdata->mem_size, sizeof(struct persist_data_t));
 		err = -ENOMEM;
 		goto err;
