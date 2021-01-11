@@ -183,3 +183,4 @@ obj-$(CONFIG_SENSORS_SSC)		+= sensors/
 obj-$(CONFIG_TEE)		+= tee/
 obj-$(CONFIG_MMI_INFO)		+= mmi_info/
 obj-$(CONFIG_MMI_ANNOTATE)		+= mmi_annotate/
+obj-$(CONFIG_TEE_MOBICORE)		+= gud/MobiCoreDriver/
