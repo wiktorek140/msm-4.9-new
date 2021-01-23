@@ -20,10 +20,7 @@ EXTRA_CFLAGS += -Wall
 EXTRA_CFLAGS += -DNDEBUG
 EXTRA_CFLAGS +=  -Wno-declaration-after-statement
 
-obj-$(CONFIG_TEE_MOBICORE) += mcDrvModule.o
-
-
-mcDrvModule-y := \
+mcDrvModule-objs := \
 	admin.o \
 	client.o \
 	clientlib.o \
@@ -40,3 +37,5 @@ mcDrvModule-y := \
 	session.o \
 	teeclientapi.o \
 	user.o
+
+obj-$(CONFIG_TEE_MOBICORE) += mcDrvModule.o
