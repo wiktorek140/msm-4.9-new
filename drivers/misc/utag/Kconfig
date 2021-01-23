@@ -1,0 +1,5 @@
+config MOTO_UTAG
+	bool "Motorola utag driver"
+	default n
+	help
+	  Say yes if u want to enable utag driver
