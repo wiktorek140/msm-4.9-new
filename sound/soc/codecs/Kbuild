@@ -83,3 +83,9 @@ ifeq ($(CONFIG_GINNA_DTB), y)
 snd_smartpa_aw882xx-objs = aw882xx.o
 obj-y += snd_smartpa_aw882xx.o
 endif
+
+ifeq ($(CONFIG_MONTANA_DTB), y)
+cirrus_cs35l35-objs = cs35l35.o
+obj-y += cirrus_cs35l35.o wm_adsp.o
+endif
+
