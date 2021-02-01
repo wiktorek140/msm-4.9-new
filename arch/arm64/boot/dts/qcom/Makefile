@@ -110,22 +110,7 @@ sdm632-channel-tmo-dvt-overlay.dtbo-base := \
 
 msm8940-surfna-evt-overlay.dtbo-base := \
 	msm8940-surfna-base.dtb
-else
-dtb-$(CONFIG_ARCH_QCOM)	+= apq8016-sbc.dtb msm8916-mtp.dtb
-dtb-$(CONFIG_ARCH_QCOM)	+= msm8996-mtp.dtb
-dtb-$(CONFIG_ARCH_QCOM)	+= apq8096-db820c.dtb
 
-ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
-
-	dtbo-$(CONFIG_CEDRIC_DTB) += msm8937-cedric-mot-overlay.dtbo
-
-msm8937-cedric-mot-overlay.dtbo-base += msm8937-cedric-base.dts
-
-	dtbo-$(CONFIG_MONTANA_DTB) += msm8937-montana-mot-overlay.dtbo
-
-msm8937-montana-mot-overlay.dtbo-base += msm8937-montana-base.dts
-
-else
 dtb-$(CONFIG_CEDRIC_DTB) += \
 	msm8937-cedric-p1.dtb \
 	msm8937-cedric-p2.dtb \
@@ -146,9 +131,11 @@ dtb-$(CONFIG_SANDERS_DTB) += \
 	msm8953-sanders-p3.dtb \
 	msm8953-sanders-p4.dtb
 
-endif
+else
+dtb-$(CONFIG_ARCH_QCOM)	+= apq8016-sbc.dtb msm8916-mtp.dtb
+dtb-$(CONFIG_ARCH_QCOM)	+= msm8996-mtp.dtb
+dtb-$(CONFIG_ARCH_QCOM)	+= apq8096-db820c.dtb
 
-ifneq ($(CONFIG_MMI_DTB),y)
 ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
 	dtbo-$(CONFIG_ARCH_SDM845) += \
 		sdm845-cdp-overlay.dtbo \
@@ -195,7 +182,7 @@ ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
 		sda845-v2.1-cdp-sdxpoorwills-overlay.dtbo \
 		sda845-v2.1-mtp-sdxpoorwills-overlay.dtbo \
 		sda845-v2-mtp-sdxpoorwills-overlay.dtbo
-		
+
 sdm845-cdp-overlay.dtbo-base := sdm845.dtb
 sdm845-mtp-overlay.dtbo-base := sdm845.dtb
 sdm845-qrd-overlay.dtbo-base := sdm845.dtb
@@ -240,9 +227,7 @@ sda845-v2.1-4k-panel-qrd-overlay.dtbo-base := sda845-v2.1.dtb
 sda845-v2.1-cdp-sdxpoorwills-overlay.dtbo-base := sda845-v2.1.dtb
 sda845-v2.1-mtp-sdxpoorwills-overlay.dtbo-base := sda845-v2.1.dtb
 sda845-v2-mtp-sdxpoorwills-overlay.dtbo-base := sda845-v2.dtb
-endif
-
-ifneq ($(CONFIG_MMI_DTB),y)
+else
 dtb-$(CONFIG_ARCH_SDM845) += sdm845-sim.dtb \
 	sdm845-rumi.dtb \
 	sdm845-mtp.dtb \
@@ -262,6 +247,7 @@ dtb-$(CONFIG_ARCH_SDM845) += sdm845-sim.dtb \
 	sdm845-interposer-sdm670-cdp.dtb \
 	sdm845-v2.1-rb3.dtb \
 	sdm845-v2.1-mtp.dtb
+endif
 
 ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
 	dtbo-$(CONFIG_ARCH_SDM670) += \
@@ -822,7 +808,6 @@ dtb-$(CONFIG_ARCH_SDM429) += sdm429-mtp.dtb \
 
 endif
 endif  #CONFIG_MMI_DEVICE_DTBS
-endif
 
 dtb-$(CONFIG_ARCH_SDM845_VM) += sdm845-vm.dtb
 
