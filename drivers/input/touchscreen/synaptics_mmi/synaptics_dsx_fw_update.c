@@ -25,7 +25,6 @@
 #include <linux/firmware.h>
 #include <linux/platform_device.h>
 #include <linux/wakelock.h>
-#include <soc/qcom/bootinfo.h>
 #include "synaptics_dsx_i2c.h"
 
 #define FORCE_UPDATE false
@@ -4449,16 +4448,6 @@ static int synaptics_rmi4_fwu_init(struct synaptics_rmi4_data *rmi4_data)
 			goto exit_remove_attrs;
 		}
 	}
-
-        if (strncmp(bi_bootmode(), "mot-factory", strlen("mot-factory")) == 0) {
-                retval = sysfs_create_file(SYSFS_KOBJ, &erase_attr[0].attr);
-                if (retval < 0) {
-                        dev_err(LOGDEV,
-                                        "%s: Failed to create erase sysfs attributes\n",
-                                        __func__);
-                } else
-                        fwu->has_erase_all = true;
-        }
 
 	return 0;
 
