@@ -209,7 +209,7 @@ found:
 					"Unable to set voltage on %s, %d\n",
 					name, rc);
 		}
-		rc = regulator_set_optimum_mode(vreg, vreg_conf[i].ua_load);
+		rc = regulator_set_load(vreg, vreg_conf[i].ua_load);
 		if (rc < 0)
 			dev_err(dev, "Unable to set current on %s, %d\n",
 					name, rc);
@@ -616,28 +616,6 @@ static int fpc1020_remove(struct spi_device *spi)
 	return 0;
 }
 
-static int fpc1020_suspend(struct spi_device *spi, pm_message_t mesg)
-{
-	struct fpc1020_data *fpc1020 = dev_get_drvdata(&spi->dev);
-
-	fpc1020->clocks_suspended = fpc1020->clocks_enabled;
-	dev_info(fpc1020->dev, "fpc1020_suspend\n");
-	if (fpc1020->clocks_suspended)
-		__set_clks(fpc1020, false);
-	return 0;
-}
-
-static int fpc1020_resume(struct spi_device *spi)
-{
-	struct fpc1020_data *fpc1020 = dev_get_drvdata(&spi->dev);
-
-	if (fpc1020->clocks_suspended) {
-		dev_info(fpc1020->dev, "fpc1020_resume\n");
-		__set_clks(fpc1020, true);
-	}
-	return 0;
-}
-
 static struct of_device_id fpc1020_of_match[] = {
 	{ .compatible = "fpc,fpc1020", },
 	{}
@@ -652,8 +630,6 @@ static struct spi_driver fpc1020_driver = {
 	},
 	.probe		= fpc1020_probe,
 	.remove		= fpc1020_remove,
-	.suspend	= fpc1020_suspend,
-	.resume		= fpc1020_resume,
 };
 
 static int __init fpc1020_init(void)
