@@ -949,6 +949,12 @@ static irqreturn_t msm_cpp_irq(int irq_num, void *data)
 	if (irq_status & 0x8) {
 		tx_level = msm_camera_io_r(cpp_dev->base +
 			MSM_CPP_MICRO_FIFO_TX_STAT) >> 2;
+#ifdef CONFIG_MSMB_CAMERA_LEGACY
+		for (i = 0; i < tx_level; i++) {
+			tx_fifo[i] = msm_camera_io_r(cpp_dev->base +
+				MSM_CPP_MICRO_FIFO_TX_DATA);
+		}
+#else
 		if (tx_level < MSM_CPP_TX_FIFO_LEVEL) {
 			for (i = 0; i < tx_level; i++) {
 				tx_fifo[i] = msm_camera_io_r(cpp_dev->base +
@@ -958,6 +964,7 @@ static irqreturn_t msm_cpp_irq(int irq_num, void *data)
 			pr_err("Fatal invalid tx level %d", tx_level);
 			goto err;
 		}
+#endif
 		spin_lock_irqsave(&cpp_dev->tasklet_lock, flags);
 		queue_cmd = &cpp_dev->tasklet_queue_cmd[cpp_dev->taskletq_idx];
 		if (queue_cmd->cmd_used) {
