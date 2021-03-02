@@ -209,7 +209,7 @@ static int stmvl53l0x_cci_init(struct cci_data *data)
 		data->msm_sd.sd.flags |= V4L2_SUBDEV_FL_HAS_DEVNODE;
 		snprintf(data->msm_sd.sd.name, ARRAY_SIZE(data->msm_sd.sd.name),
 			"msm_tof");
-		media_entity_init(&data->msm_sd.sd.entity, 0, NULL, 0);
+		media_entity__pads_init(&data->msm_sd.sd.entity, 0, NULL);
 		data->msm_sd.sd.entity.type = MEDIA_ENT_T_V4L2_SUBDEV;
 		data->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_TOF;
 		data->msm_sd.close_seq = MSM_SD_CLOSE_2ND_CATEGORY | 0x2;

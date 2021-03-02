@@ -201,7 +201,7 @@ static int __init cci_intf_init(void)
 	fctrl.msm_sd.sd.flags |= V4L2_SUBDEV_FL_HAS_DEVNODE;
 	snprintf(fctrl.msm_sd.sd.name, ARRAY_SIZE(fctrl.msm_sd.sd.name),
 			"msm_cci_intf");
-	rc = media_entity_init(&fctrl.msm_sd.sd.entity, 0, NULL, 0);
+	rc = media_entity_pads_init(&fctrl.msm_sd.sd.entity, 0, NULL);
 	if (rc < 0) {
 		pr_err("%s: failed media_entity_init (%d)\n", __func__, rc);
 		return rc;
