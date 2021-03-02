@@ -308,6 +308,7 @@ struct msm_camera_i2c_reg_setting {
 struct msm_sensor_id_info_t {
 	unsigned short sensor_id_reg_addr;
 	unsigned short sensor_id;
+	unsigned short sensor_id2;
 	unsigned short sensor_id_mask;
 	struct msm_camera_i2c_reg_setting setting;
 };

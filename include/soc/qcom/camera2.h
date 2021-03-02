@@ -46,6 +46,7 @@ struct msm_camera_slave_info {
 	uint16_t sensor_slave_addr;
 	uint16_t sensor_id_reg_addr;
 	uint16_t sensor_id;
+	uint16_t sensor_id2;
 	uint16_t sensor_id_mask;
 	struct msm_camera_i2c_reg_setting *setting;
 };

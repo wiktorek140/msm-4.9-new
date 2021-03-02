@@ -1036,6 +1036,7 @@ int32_t msm_sensor_driver_probe(void *setting,
 	camera_info->sensor_id_reg_addr =
 		slave_info->sensor_id_info.sensor_id_reg_addr;
 	camera_info->sensor_id = slave_info->sensor_id_info.sensor_id;
+	camera_info->sensor_id2 = slave_info->sensor_id_info.sensor_id2;
 	camera_info->sensor_id_mask = slave_info->sensor_id_info.sensor_id_mask;
 	camera_info->setting = &(slave_info->sensor_id_info.setting);
 
