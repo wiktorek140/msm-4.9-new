@@ -1850,7 +1850,7 @@ static void qpnp_flash_led_brightness_set(struct led_classdev *led_cdev,
 		return;
 	}
 
-	dev_dbg(&flash_node->spmi_dev->dev, "set %s to %dmA\n",
+	dev_dbg(&flash_node->pdev->dev, "set %s to %dmA\n",
 		led_cdev->name, value);
 
 	if (value > flash_node->cdev.max_brightness)
