@@ -274,3 +274,15 @@ config CAMERA_CLOCK_BOOTTIME
 	default n
 	---help---
 		Enables support CLOCK_BOOTTIME.
+
+config MSMB_CAMERA_2017
+	bool "Qualcomm MSM camera sensor support"
+	depends on MSMB_CAMERA
+    ---help---
+      This flag enables support for 2017 Motorola devices.
+
+config MSMB_CAMERA_LEGACY
+	bool "Qualcomm MSM camera sensor support"
+	depends on MSMB_CAMERA
+    ---help---
+      This flag enables support for 2017 Motorola devices.
