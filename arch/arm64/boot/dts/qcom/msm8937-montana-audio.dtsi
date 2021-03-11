@@ -16,9 +16,7 @@
 };
 
 &soc {
-	/delete-node/ wsa881x_analog_clk_pctrl;
-
-	cdc_cs35l35_mclk: wsa881x_analog_clk_pctrl {
+	cdc_cs35l35_mclk: cdc_cs35l35_mi2s_gpios {
 		compatible = "qcom,msm-cdc-pinctrl";
 		pinctrl-names = "aud_active", "aud_sleep";
 		pinctrl-0 = <&cs35l35_mclk_on>;
@@ -94,7 +92,7 @@
 				"msm-dai-q6-mi2s.0", "msm-dai-q6-mi2s.1",
 				"msm-dai-q6-mi2s.2", "msm-dai-q6-mi2s.3",
 				"msm-dai-q6-mi2s.4", "msm-dai-q6-mi2s.6",
-				"msm-dai-q6-dev.16384", "msmdai-q6-dev.16385",
+				"msm-dai-q6-dev.16384", "msm-dai-q6-dev.16385",
 				"msm-dai-q6-dev.16386", "msm-dai-q6-dev.16387",
 				"msm-dai-q6-dev.16390", "msm-dai-q6-dev.16391",
 				"msm-dai-q6-dev.16392", "msm-dai-q6-dev.16393",
@@ -254,5 +252,8 @@
 
 &wsa881x_i2c_f {
 	status = "disabled";
-	qcom,wsa-analog-clk-gpio = <&wsa881x_analog_vi_gpio>;
+};
+
+&wsa881x_analog_clk_gpio {
+	status = "disabled";
 };
