@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Motorola Mobility LLC.
+ * Copyright (C) 2018 Motorola Mobility LLC.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -12,40 +12,30 @@
  *
  */
 
+//#define DEBUG
+
 #include <linux/module.h>
-#include "msm_sd.h"
-#include "sensor/cci/msm_cci.h"
-#include <media/cci_intf.h>
+#include <linux/miscdevice.h>
+#include <cam_cci_dev.h>
 #include <media/v4l2-ioctl.h>
+#include <media/cci_intf.h>
 
-#ifdef CONFIG_COMPAT
-static struct v4l2_file_operations msm_cci_intf_v4l2_subdev_fops;
-#endif
-
-struct msm_cci_intf_ctrl_t {
-	struct msm_sd_subdev msm_sd;
-	struct platform_device *pdev;
-	uint32_t subdev_id;
-};
-
-static struct msm_cci_intf_ctrl_t fctrl;
-
-static int32_t cci_intf_xfer(struct v4l2_subdev *sd,
+static int32_t cci_intf_xfer(
 		struct msm_cci_intf_xfer *xfer,
-		unsigned int cmd)
+		int cmd)
 {
 	int32_t rc, rc2;
 	uint16_t addr;
-	struct msm_camera_cci_client cci_info = {
-		.cci_subdev     = msm_cci_get_subdev(),
+	struct cam_sensor_cci_client cci_info = {
+		.cci_subdev     = cam_cci_get_subdev(),
 		.cci_i2c_master = xfer->cci_bus,
 		.sid            = xfer->slave_addr,
 	};
-	struct msm_camera_cci_ctrl cci_ctrl = {
+	struct cam_cci_ctrl cci_ctrl = {
 		.cci_info = &cci_info,
 	};
 	int i;
-	struct msm_camera_i2c_reg_array *reg_conf_tbl;
+	struct cam_sensor_i2c_reg_array *reg_conf_tbl;
 
 	pr_debug("%s cmd:%d bus:%d devaddr:%02x regw:%d rega:%04x count:%d\n",
 			__func__, cmd, xfer->cci_bus, xfer->slave_addr,
@@ -60,7 +50,7 @@ static int32_t cci_intf_xfer(struct v4l2_subdev *sd,
 
 	/* init */
 	cci_ctrl.cmd = MSM_CCI_INIT;
-	rc = v4l2_subdev_call(msm_cci_get_subdev(),
+	rc = v4l2_subdev_call(cam_cci_get_subdev(),
 			core, ioctl, VIDIOC_MSM_CCI_CFG, &cci_ctrl);
 	if (rc < 0) {
 		pr_err("%s: cci init fail (%d)\n", __func__, rc);
@@ -74,11 +64,11 @@ static int32_t cci_intf_xfer(struct v4l2_subdev *sd,
 		cci_ctrl.cfg.cci_i2c_read_cfg.addr = xfer->reg.addr;
 		cci_ctrl.cfg.cci_i2c_read_cfg.addr_type =
 			(xfer->reg.width == 1 ?
-			 MSM_CAMERA_I2C_BYTE_ADDR :
-			 MSM_CAMERA_I2C_WORD_ADDR);
+			 CAMERA_SENSOR_I2C_TYPE_BYTE :
+			 CAMERA_SENSOR_I2C_TYPE_WORD);
 		cci_ctrl.cfg.cci_i2c_read_cfg.data = xfer->data.buf;
 		cci_ctrl.cfg.cci_i2c_read_cfg.num_byte = xfer->data.count;
-		rc = v4l2_subdev_call(msm_cci_get_subdev(),
+		rc = v4l2_subdev_call(cam_cci_get_subdev(),
 			core, ioctl, VIDIOC_MSM_CCI_CFG, &cci_ctrl);
 		if (rc < 0) {
 			pr_err("%s: cci read fail (%d)\n", __func__, rc);
@@ -89,7 +79,7 @@ static int32_t cci_intf_xfer(struct v4l2_subdev *sd,
 	case MSM_CCI_INTF_WRITE:
 		/* write */
 		reg_conf_tbl = kzalloc(xfer->data.count *
-				sizeof(struct msm_camera_i2c_reg_array),
+				sizeof(struct cam_sensor_i2c_reg_array),
 				GFP_KERNEL);
 		if (!reg_conf_tbl) {
 			rc = -ENOMEM;
@@ -105,12 +95,12 @@ static int32_t cci_intf_xfer(struct v4l2_subdev *sd,
 		cci_ctrl.cfg.cci_i2c_write_cfg.reg_setting = reg_conf_tbl;
 		cci_ctrl.cfg.cci_i2c_write_cfg.addr_type =
 			(xfer->reg.width == 1 ?
-				MSM_CAMERA_I2C_BYTE_ADDR :
-				MSM_CAMERA_I2C_WORD_ADDR);
+				CAMERA_SENSOR_I2C_TYPE_BYTE :
+				CAMERA_SENSOR_I2C_TYPE_WORD);
 		cci_ctrl.cfg.cci_i2c_write_cfg.data_type =
-			MSM_CAMERA_I2C_BYTE_DATA;
+			CAMERA_SENSOR_I2C_TYPE_BYTE;
 		cci_ctrl.cfg.cci_i2c_write_cfg.size = xfer->data.count;
-		rc = v4l2_subdev_call(msm_cci_get_subdev(),
+		rc = v4l2_subdev_call(cam_cci_get_subdev(),
 				core, ioctl, VIDIOC_MSM_CCI_CFG, &cci_ctrl);
 		kfree(reg_conf_tbl);
 		if (rc < 0) {
@@ -128,7 +118,7 @@ static int32_t cci_intf_xfer(struct v4l2_subdev *sd,
 release:
 	/* release */
 	cci_ctrl.cmd = MSM_CCI_RELEASE;
-	rc2 = v4l2_subdev_call(msm_cci_get_subdev(),
+	rc2 = v4l2_subdev_call(cam_cci_get_subdev(),
 			core, ioctl, VIDIOC_MSM_CCI_CFG, &cci_ctrl);
 	if (rc2 < 0) {
 		pr_err("%s: cci release fail (%d)\n", __func__, rc2);
@@ -138,55 +128,61 @@ release:
 	return rc;
 }
 
-static long msm_cci_intf_ioctl(struct v4l2_subdev *sd,
-		unsigned int cmd, void *arg)
+static long cci_intf_ioctl(struct file *file, unsigned int cmd,
+		unsigned long arg)
 {
-	pr_debug("%s cmd=%x\n", __func__, cmd);
+	struct msm_cci_intf_xfer xfer;
+	int rc;
+
+	pr_debug("%s cmd=%x arg=%lx\n", __func__, cmd, arg);
 
 	switch (cmd) {
 	case MSM_CCI_INTF_READ:
 	case MSM_CCI_INTF_WRITE:
-		return cci_intf_xfer(sd, (struct msm_cci_intf_xfer *)arg, cmd);
+		if (copy_from_user(&xfer, (void __user *)arg, sizeof(xfer)))
+			return -EFAULT;
+		rc = cci_intf_xfer(&xfer, cmd);
+		if (copy_to_user((void __user *)arg, &xfer, sizeof(xfer)))
+			return -EFAULT;
+		return rc;
 	default:
 		return -ENOIOCTLCMD;
 	}
 }
 
-static struct v4l2_subdev_core_ops msm_cci_intf_subdev_core_ops = {
-	.ioctl = msm_cci_intf_ioctl,
-};
-
-static struct v4l2_subdev_ops msm_cci_intf_subdev_ops = {
-	.core = &msm_cci_intf_subdev_core_ops,
-};
-
-static const struct v4l2_subdev_internal_ops msm_cci_intf_internal_ops;
-
 #ifdef CONFIG_COMPAT
-static long msm_cci_intf_subdev_do_ioctl(
-		struct file *file, unsigned int cmd, void *arg)
+static long cci_intf_ioctl_compat(struct file *file, unsigned int cmd,
+		unsigned long arg)
 {
-	struct video_device *vdev = video_devdata(file);
-	struct v4l2_subdev *sd = vdev_to_v4l2_subdev(vdev);
+	pr_debug("%s cmd=%x\n", __func__, cmd);
 
 	switch (cmd) {
 	case MSM_CCI_INTF_READ32:
 		cmd = MSM_CCI_INTF_READ;
-		return cci_intf_xfer(sd, (struct msm_cci_intf_xfer *)arg, cmd);
+		break;
 	case MSM_CCI_INTF_WRITE32:
 		cmd = MSM_CCI_INTF_WRITE;
-		return cci_intf_xfer(sd, (struct msm_cci_intf_xfer *)arg, cmd);
+		break;
 	default:
 		return -ENOIOCTLCMD;
 	}
-}
-
-static long msm_cci_intf_subdev_fops_ioctl(
-		struct file *file, unsigned int cmd, unsigned long arg)
-{
-	return video_usercopy(file, cmd, arg, msm_cci_intf_subdev_do_ioctl);
+	return cci_intf_ioctl(file, cmd, arg);
 }
 #endif
+
+static const struct file_operations cci_intf_fops = {
+	.owner = THIS_MODULE,
+	.unlocked_ioctl = cci_intf_ioctl,
+#ifdef CONFIG_COMPAT
+	.compat_ioctl = cci_intf_ioctl_compat,
+#endif
+};
+
+static struct miscdevice cci_intf_misc = {
+	.minor = MISC_DYNAMIC_MINOR,
+	.name = "cci_intf",
+	.fops = &cci_intf_fops,
+};
 
 static int __init cci_intf_init(void)
 {
@@ -194,34 +190,12 @@ static int __init cci_intf_init(void)
 
 	pr_debug("%s\n", __func__);
 
-	v4l2_subdev_init(&fctrl.msm_sd.sd, &msm_cci_intf_subdev_ops);
-	v4l2_set_subdevdata(&fctrl.msm_sd.sd, &fctrl);
-
-	fctrl.msm_sd.sd.internal_ops = &msm_cci_intf_internal_ops;
-	fctrl.msm_sd.sd.flags |= V4L2_SUBDEV_FL_HAS_DEVNODE;
-	snprintf(fctrl.msm_sd.sd.name, ARRAY_SIZE(fctrl.msm_sd.sd.name),
-			"msm_cci_intf");
-	rc = media_entity_pads_init(&fctrl.msm_sd.sd.entity, 0, NULL);
-	if (rc < 0) {
-		pr_err("%s: failed media_entity_init (%d)\n", __func__, rc);
-		return rc;
-	}
-	fctrl.msm_sd.sd.entity.type = MEDIA_ENT_T_V4L2_SUBDEV;
-	fctrl.msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_CCI_INTF;
-	rc = msm_sd_register(&fctrl.msm_sd);
-	if (rc < 0) {
-		pr_err("%s: failed msm_sd_register (%d)\n", __func__, rc);
-		media_entity_cleanup(&fctrl.msm_sd.sd.entity);
+	rc = misc_register(&cci_intf_misc);
+	if (unlikely(rc)) {
+		pr_err("failed to register misc device %s\n", cci_intf_misc.name);
 		return rc;
 	}
 
-#ifdef CONFIG_COMPAT
-	msm_cci_intf_v4l2_subdev_fops = v4l2_subdev_fops;
-	msm_cci_intf_v4l2_subdev_fops.compat_ioctl32 =
-		msm_cci_intf_subdev_fops_ioctl;
-	fctrl.msm_sd.sd.devnode->fops =
-		&msm_cci_intf_v4l2_subdev_fops;
-#endif
 	return 0;
 }
 
@@ -229,8 +203,7 @@ static void __exit cci_intf_exit(void)
 {
 	pr_debug("%s\n", __func__);
 
-	msm_sd_unregister(&fctrl.msm_sd);
-	media_entity_cleanup(&fctrl.msm_sd.sd.entity);
+	misc_deregister(&cci_intf_misc);
 }
 
 module_init(cci_intf_init);
