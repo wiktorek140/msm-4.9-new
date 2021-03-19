@@ -2926,7 +2926,11 @@ static void __flush_debug_queue(struct venus_hfi_device *device, u8 *packet)
 	}
 
 	if (!packet) {
-		packet = kzalloc(VIDC_IFACEQ_VAR_HUGE_PKT_SIZE, GFP_TEMPORARY);
+		if (VIDC_IFACEQ_VAR_HUGE_PKT_SIZE > PAGE_SIZE)
+			packet = vzalloc(VIDC_IFACEQ_VAR_HUGE_PKT_SIZE);
+		else
+			packet = kzalloc(VIDC_IFACEQ_VAR_HUGE_PKT_SIZE,
+					GFP_TEMPORARY);
 		if (!packet) {
 			dprintk(VIDC_ERR, "In %s() Fail to allocate mem\n",
 				__func__);
@@ -2994,7 +2998,7 @@ static void __flush_debug_queue(struct venus_hfi_device *device, u8 *packet)
 #undef SKIP_INVALID_PKT
 
 	if (local_packet)
-		kfree(packet);
+		kvfree(packet);
 }
 
 static bool __is_session_valid(struct venus_hfi_device *device,
