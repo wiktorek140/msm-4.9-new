@@ -156,11 +156,7 @@ static int32_t msm_camera_spi_tx_helper(struct msm_camera_i2c_client *client,
 	msm_camera_set_addr(addr, inst->addr_len, client->addr_type, ctx + 1);
 	while ((rc = msm_camera_spi_txfr(spi, ctx, crx, len)) && retries) {
 		retries--;
-		if (client->spi_client->retry_delay > 20)
-			msleep(client->spi_client->retry_delay);
-		else if (client->spi_client->retry_delay)
-			usleep_range(client->spi_client->retry_delay * 1000,
-				client->spi_client->retry_delay * 1000 + 1000);
+		msleep(client->spi_client->retry_delay);
 	}
 	if (rc < 0) {
 		SPIDBG("%s: failed %d\n", __func__, rc);
@@ -227,11 +223,7 @@ static int32_t msm_camera_spi_tx_read(struct msm_camera_i2c_client *client,
 	while ((rc = msm_camera_spi_txfr_read(spi, ctx, crx, hlen, num_byte))
 			&& retries) {
 		retries--;
-		if (client->spi_client->retry_delay > 20)
-			msleep(client->spi_client->retry_delay);
-		else if (client->spi_client->retry_delay)
-			usleep_range(client->spi_client->retry_delay * 1000,
-				client->spi_client->retry_delay * 1000 + 1000);
+		msleep(client->spi_client->retry_delay);
 	}
 	if (rc < 0) {
 		pr_err("%s: failed %d\n", __func__, rc);
@@ -353,10 +345,7 @@ static int32_t msm_camera_spi_wait(struct msm_camera_i2c_client *client,
 		if (!busy)
 			break;
 
-		if (inst->delay_intv > 20)
-			msleep(inst->delay_intv);
-		else if (inst->delay_intv)
-			usleep_range(inst->delay_intv * 1000, inst->delay_intv * 1000 + 1000);
+		msleep(inst->delay_intv);
 		SPIDBG("%s: op 0x%x wait\n", __func__, inst->opcode);
 	}
 	if (i > inst->delay_count) {
@@ -451,11 +440,7 @@ static int32_t msm_camera_spi_page_program(struct msm_camera_i2c_client *client,
 		len, tx[0], tx[1], tx[2], tx[3]);
 	while ((rc = spi_write(spi, tx, len + header_len)) && retries) {
 		rc = msm_camera_spi_wait(client, pg);
-		if (client->spi_client->retry_delay > 20)
-			msleep(client->spi_client->retry_delay);
-		else if (client->spi_client->retry_delay)
-			usleep_range(client->spi_client->retry_delay * 1000,
-				client->spi_client->retry_delay * 1000 + 1000);
+		msleep(client->spi_client->retry_delay);
 		retries--;
 	}
 	if (rc < 0) {
