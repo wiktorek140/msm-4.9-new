@@ -321,11 +321,10 @@ int v4l2_event_unsubscribe(struct v4l2_fh *fh,
 	if (sev && sev->ops && sev->ops->del)
 		sev->ops->del(sev);
 
-	if(sev)
-  		kvfree(sev);
 	mutex_unlock(&fh->subscribe_lock);
 
-	kfree(sev);
+	if(sev)
+  		kvfree(sev);
 
 	return 0;
 }

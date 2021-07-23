@@ -234,7 +234,11 @@ static int __get_v4l2_format32(struct v4l2_format __user *kp,
 		return copy_in_user(&kp->fmt.sdr, &up->fmt.sdr,
 				    sizeof(kp->fmt.sdr)) ? -EFAULT : 0;
 	default:
+#ifdef CONFIG_MSMB_CAMERA_LEGACY
+		return 0;
+#else
 		return -EINVAL;
+#endif
 	}
 }
 

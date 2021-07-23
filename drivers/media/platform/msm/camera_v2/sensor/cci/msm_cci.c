@@ -39,13 +39,13 @@
 #define MSM_CCI_DRV_NAME "msm_cci"
 
 #undef CDBG
-#define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#define CDBG(fmt, args...) pr_err(fmt, ##args)
 
 #undef CCI_DBG
 #ifdef MSM_CCI_DEBUG
 #define CCI_DBG(fmt, args...) pr_err(fmt, ##args)
 #else
-#define CCI_DBG(fmt, args...) pr_debug(fmt, ##args)
+#define CCI_DBG(fmt, args...) pr_err(fmt, ##args)
 #endif
 
 #define CCI_DUMP_REG 0
@@ -1318,6 +1318,9 @@ static int32_t msm_cci_init(struct v4l2_subdev *sd,
 	enum cci_i2c_master_t master = MASTER_0;
 	uint32_t *clk_rates  = NULL;
 
+
+	pr_err("%s: init start\n",
+				__func__);
 	cci_dev = v4l2_get_subdevdata(sd);
 	if (!cci_dev || !c_ctrl) {
 		pr_err("%s:%d failed: invalid params %pK %pK\n", __func__,

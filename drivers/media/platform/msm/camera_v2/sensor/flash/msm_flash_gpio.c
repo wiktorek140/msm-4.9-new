@@ -21,14 +21,14 @@
 #include "msm_cci.h"
 
 #undef CDBG
-#define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#define CDBG(fmt, args...) pr_err(fmt, ##args)
 enum msm_flash_driver_type flash_type_gpio = FLASH_DRIVER_DEFAULT;
 DEFINE_MSM_MUTEX(msm_flash_mutex);
 
 static struct v4l2_file_operations msm_flash_v4l2_subdev_fops;
 
 static const struct of_device_id msm_flash_dt_match[] = {
-	{.compatible = "qcom,camera-gpio-flash", .data = NULL},
+	{.compatible = "qcom,camera-gpio-flash-moto", .data = NULL},
 	{}
 };
 static int32_t msm_flash_init_gpio_pin_tbl(struct device_node *of_node,
@@ -643,6 +643,7 @@ static int32_t msm_flash_platform_probe(struct platform_device *pdev)
 		ARRAY_SIZE(flash_ctrl->msm_sd.sd.name),
 		"msm_camera_flash_gpio");
 	media_entity_pads_init(&flash_ctrl->msm_sd.sd.entity, 0, NULL);
+	flash_ctrl->msm_sd.sd.entity.group_id = MEDIA_ENT_F_FLASH;
 	flash_ctrl->msm_sd.close_seq = MSM_SD_CLOSE_2ND_CATEGORY | 0x1;
 	msm_sd_register(&flash_ctrl->msm_sd);
 
@@ -664,7 +665,7 @@ MODULE_DEVICE_TABLE(of, msm_flash_dt_match);
 static struct platform_driver msm_flash_platform_driver = {
 	.probe = msm_flash_platform_probe,
 	.driver = {
-		.name = "qcom,camera-gpio-flash",
+		.name = "qcom,camera-gpio-flash-moto",
 		.owner = THIS_MODULE,
 		.of_match_table = msm_flash_dt_match,
 	},

@@ -869,7 +869,7 @@ int __video_register_device(struct video_device *vdev, int type, int nr,
 		break;
 	case VFL_TYPE_MOT_GRABBER:
 		name_base = "mot_camera_ext";
-                break;
+        break;
 	default:
 		printk(KERN_ERR "%s called with unknown type: %d\n",
 		       __func__, type);

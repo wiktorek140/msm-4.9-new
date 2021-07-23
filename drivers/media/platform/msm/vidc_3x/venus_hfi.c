@@ -3620,7 +3620,7 @@ static int __response_handler(struct venus_hfi_device *device)
 exit:
 	__flush_debug_queue(device, raw_packet);
 
-	kfree(raw_packet);
+	kvfree(raw_packet);
 	return packet_count;
 }
 

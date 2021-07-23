@@ -2606,7 +2606,7 @@ int msm_vfe47_get_clks(struct vfe_device *vfe_dev)
 	if (rc)
 		return rc;
 
-	vfe_dev->num_norm_clk = vfe_dev->num_clk;
+	/*vfe_dev->num_norm_clk = vfe_dev->num_clk;
 	for (i = 0; i < vfe_dev->num_clk; i++) {
 		if (strcmp(vfe_dev->vfe_clk_info[i].clk_name,
 				"camss_vfe_stream_clk") == 0) {
@@ -2620,7 +2620,7 @@ int msm_vfe47_get_clks(struct vfe_device *vfe_dev)
 	if (i >= vfe_dev->num_clk)
 		pr_err("%s: cannot find camss_vfe_stream_clk\n", __func__);
 	else {
-		/* Switch stream_clk to the last element*/
+		/* Switch stream_clk to the last element
 		for (; i < vfe_dev->num_clk - 1; i++) {
 			vfe_dev->vfe_clk[i] = vfe_dev->vfe_clk[i+1];
 			vfe_dev->vfe_clk_info[i] = vfe_dev->vfe_clk_info[i+1];
@@ -2631,7 +2631,7 @@ int msm_vfe47_get_clks(struct vfe_device *vfe_dev)
 			&vfe_dev->vfe_clk_info[vfe_dev->num_clk-1];
 		vfe_dev->hvx_clk = &vfe_dev->vfe_clk[vfe_dev->num_clk-1];
 		vfe_dev->hvx_clk_state = false;
-	}
+	}*/
 
 	for (i = 0; i < vfe_dev->num_clk; i++) {
 		if (strcmp(vfe_dev->vfe_clk_info[i].clk_name,

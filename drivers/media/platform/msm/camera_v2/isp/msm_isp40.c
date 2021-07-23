@@ -1844,6 +1844,14 @@ static void msm_vfe40_axi_restart(struct vfe_device *vfe_dev,
 	/* Start AXI */
 	msm_camera_io_w(0x0, vfe_dev->vfe_base + 0x2C0);
 
+#ifdef CONFIG_MSMB_CAMERA_LEGACY
+#ifdef CONFIG_MSMB_CAMERA_2017
+	if (vfe_dev->recovery_irq0_mask || vfe_dev->recovery_irq1_mask)
+#endif
+		msm_vfe40_config_irq(vfe_dev, vfe_dev->recovery_irq0_mask,
+		vfe_dev->recovery_irq1_mask, MSM_ISP_IRQ_SET);
+#endif
+
 	vfe_dev->hw_info->vfe_ops.core_ops.reg_update(vfe_dev, VFE_SRC_MAX);
 	memset(&vfe_dev->error_info, 0, sizeof(vfe_dev->error_info));
 	atomic_set(&vfe_dev->error_info.overflow_state, NO_OVERFLOW);
