@@ -7962,16 +7962,14 @@ static int afe_init_cal_data(void)
 		{NULL, NULL, cal_utils_match_buf_num} },
 
 		{{AFE_SIDETONE_CAL_TYPE,
-		{afe_alloc_cal, afe_dealloc_cal, NULL,
+		{NULL, NULL, NULL,
 		afe_set_cal, NULL, NULL} },
-		{afe_map_cal_data, afe_unmap_cal_data,
-		cal_utils_match_buf_num} },
+		{NULL, NULL, cal_utils_match_buf_num} },
 
 		{{AFE_SIDETONE_IIR_CAL_TYPE,
-		{afe_alloc_cal, afe_dealloc_cal, NULL,
+		{NULL, NULL, NULL,
 		afe_set_cal, NULL, NULL} },
-		{afe_map_cal_data, afe_unmap_cal_data,
-		cal_utils_match_buf_num} },
+		{NULL, NULL, cal_utils_match_buf_num} },
 
 		{{AFE_TOPOLOGY_CAL_TYPE,
 		{NULL, NULL, NULL,
