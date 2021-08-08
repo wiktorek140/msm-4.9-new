@@ -374,22 +374,10 @@ static int pmic_arb_read_cmd(struct spmi_controller *ctrl, u8 opc, u8 sid,
 	u32 cmd;
 	int rc;
 	u32 offset;
-	mode_t mode;
 
 	rc = pa->ver_ops->offset(pa, sid, addr, PMIC_ARB_CHANNEL_OBS, &offset);
 	if (rc)
 		return rc;
-
-	rc = pa->ver_ops->mode(pa, sid, addr, &mode);
-	if (rc)
-		return rc;
-
-	if (!(mode & 0400)) {
-		dev_err(&pa->spmic->dev,
-			"error: impermissible read from peripheral sid:%d addr:0x%x\n",
-			sid, addr);
-		return -ENODEV;
-	}
 
 	if (bc >= PMIC_ARB_MAX_TRANS_BYTES) {
 		dev_err(&ctrl->dev,
@@ -437,22 +425,10 @@ static int pmic_arb_write_cmd(struct spmi_controller *ctrl, u8 opc, u8 sid,
 	u32 cmd;
 	int rc;
 	u32 offset;
-	mode_t mode;
 
 	rc = pa->ver_ops->offset(pa, sid, addr, PMIC_ARB_CHANNEL_RW, &offset);
 	if (rc)
 		return rc;
-
-	rc = pa->ver_ops->mode(pa, sid, addr, &mode);
-	if (rc)
-		return rc;
-
-	if (!(mode & 0200)) {
-		dev_err(&pa->spmic->dev,
-			"error: impermissible write to peripheral sid:%d addr:0x%x\n",
-			sid, addr);
-		return -ENODEV;
-	}
 
 	if (bc >= PMIC_ARB_MAX_TRANS_BYTES) {
 		dev_err(&ctrl->dev,
