@@ -4148,35 +4148,35 @@ tLimMlmRemoveKeyCnf  mlmRemoveKeyCnf;
         return;
     }
 
-    /**
-      * Check if there exists a context for the
-      * peer entity for which keys need to be removed.
-      */
-    pStaDs = dphLookupHashEntry( pMac, pMlmRemoveKeyReq->peerMacAddr, &aid, &psessionEntry->dph.dphHashTable );
-    if ((pStaDs == NULL) ||
-           (pStaDs &&
-           (pStaDs->mlmStaContext.mlmState !=
-                         eLIM_MLM_LINK_ESTABLISHED_STATE)))
-    {
-       /**
-         * Received LIM_MLM_REMOVEKEY_REQ for STA
-         * that does not have context or in some
-         * transit state. Log error.
-         */
-        limLog( pMac, LOGW,
-            FL("Received MLM_REMOVEKEYS_REQ for STA that either has no context or in some transit state, Addr = "));
-        limPrintMacAddr( pMac, pMlmRemoveKeyReq->peerMacAddr, LOGW );
+  /**
+    * Check if there exists a context for the
+    * peer entity for which keys need to be removed.
+    */
+  pStaDs = dphLookupHashEntry( pMac, pMlmRemoveKeyReq->peerMacAddr, &aid, &psessionEntry->dph.dphHashTable );
+  if ((pStaDs == NULL) ||
+         (pStaDs &&
+         (pStaDs->mlmStaContext.mlmState !=
+                       eLIM_MLM_LINK_ESTABLISHED_STATE)))
+  {
+     /**
+       * Received LIM_MLM_REMOVEKEY_REQ for STA
+       * that does not have context or in some
+       * transit state. Log error.
+       */
+      limLog( pMac, LOGW,
+          FL("Received MLM_REMOVEKEYS_REQ for STA that either has no context or in some transit state, Addr = "));
+      limPrintMacAddr( pMac, pMlmRemoveKeyReq->peerMacAddr, LOGW );
 
-        // Prepare and Send LIM_MLM_REMOVEKEY_CNF
-        mlmRemoveKeyCnf.resultCode = eSIR_SME_INVALID_PARAMETERS;
-        mlmRemoveKeyCnf.sessionId = pMlmRemoveKeyReq->sessionId;
+      // Prepare and Send LIM_MLM_REMOVEKEY_CNF
+      mlmRemoveKeyCnf.resultCode = eSIR_SME_INVALID_PARAMETERS;
+      mlmRemoveKeyCnf.sessionId = pMlmRemoveKeyReq->sessionId;
+      
 
-
-        goto end;
-    }
-    else
-      staIdx = pStaDs->staIndex;
-
+      goto end;
+  }
+  else
+    staIdx = pStaDs->staIndex;
+  
 
 
     psessionEntry->limMlmState = eLIM_MLM_WT_REMOVE_STA_KEY_STATE;
@@ -4255,7 +4255,14 @@ limProcessMinChannelTimeout(tpAniSirGlobal pMac)
         {
             // This shouldn't be the case, but when this happens, this timeout should be for the last channelId. 
             // Get the channelNum as close to correct as possible.
-            channelNum = pMac->lim.gpLimMlmScanReq->channelList.channelNumber[pMac->lim.gpLimMlmScanReq->channelList.numChannels - 1];
+            if(pMac->lim.gpLimMlmScanReq->channelList.channelNumber)
+            {
+                channelNum = pMac->lim.gpLimMlmScanReq->channelList.channelNumber[pMac->lim.gpLimMlmScanReq->channelList.numChannels - 1];
+            }
+            else
+            {
+               channelNum = 1;
+            }
         }
 
         limLog(pMac, LOGW,
@@ -4324,7 +4331,14 @@ limProcessMaxChannelTimeout(tpAniSirGlobal pMac)
         }
         else
         {
-            channelNum = pMac->lim.gpLimMlmScanReq->channelList.channelNumber[pMac->lim.gpLimMlmScanReq->channelList.numChannels - 1];
+            if(pMac->lim.gpLimMlmScanReq->channelList.channelNumber)
+            {
+                channelNum = pMac->lim.gpLimMlmScanReq->channelList.channelNumber[pMac->lim.gpLimMlmScanReq->channelList.numChannels - 1];
+            }
+            else
+            {
+               channelNum = 1;
+            }
         }
         limLog(pMac, LOGW,
            FL("Sending End Scan req from MAX_CH_TIMEOUT in state %d on ch-%d"),

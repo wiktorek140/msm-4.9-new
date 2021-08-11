@@ -2371,8 +2371,6 @@ static int __iw_set_genie(struct net_device *dev,
                 memcpy( pWextState->WPARSNIE, genie - 2, (eLen + 2));
                 pWextState->roamProfile.pRSNReqIE = pWextState->WPARSNIE;
                 pWextState->roamProfile.nRSNReqIELength = eLen + 2;
-                wlan_hdd_mask_unsupported_rsn_caps(pWextState->WPARSNIE + 2,
-                                                   eLen);
               break;
 
          default:
@@ -4794,7 +4792,7 @@ static int __iw_set_encodeext(struct net_device *dev,
        }
        else {
          /*Static wep, update the roam profile with the keys */
-          if(ext->key_len <= eCSR_SECURITY_WEP_KEYSIZE_MAX_BYTES &&
+          if(ext->key && (ext->key_len <= eCSR_SECURITY_WEP_KEYSIZE_MAX_BYTES) &&
                                                                key_index < CSR_MAX_NUM_KEY) {
              vos_mem_copy(&pRoamProfile->Keys.KeyMaterial[key_index][0],ext->key,ext->key_len);
              pRoamProfile->Keys.KeyLength[key_index] = (v_U8_t)ext->key_len;
@@ -7026,7 +7024,6 @@ static int __iw_get_char_setnone(struct net_device *dev,
    *And currently it only checks P2P_CLIENT adapter.
    *P2P_DEVICE and P2P_GO have not been added as of now.
 */
-#ifdef TRACE_RECORD
         case WE_GET_STATES:
         {
             int buf = 0, len = 0;
@@ -7163,7 +7160,6 @@ static int __iw_get_char_setnone(struct net_device *dev,
             wrqu->data.length = strlen(extra)+1;
             break;
         }
-#endif
 
         case WE_GET_CFG:
         {
