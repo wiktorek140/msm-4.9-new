@@ -2493,6 +2493,12 @@ REG_TABLE_ENTRY g_registry_table[] =
               CFG_ENABLE_RX_STBC_DEFAULT,
               CFG_ENABLE_RX_STBC_MIN,
               CFG_ENABLE_RX_STBC_MAX ),
+   REG_VARIABLE( CFG_ENABLE_TX_STBC, WLAN_PARAM_Integer,
+              hdd_config_t, enableTxSTBC,
+              VAR_FLAGS_OPTIONAL | VAR_FLAGS_RANGE_CHECK_ASSUME_DEFAULT,
+              CFG_ENABLE_TX_STBC_DEFAULT,
+              CFG_ENABLE_TX_STBC_MIN,
+              CFG_ENABLE_TX_STBC_MAX ),
 #ifdef FEATURE_WLAN_TDLS
    REG_VARIABLE( CFG_TDLS_SUPPORT_ENABLE, WLAN_PARAM_Integer,
               hdd_config_t, fEnableTDLSSupport,
@@ -4056,6 +4062,15 @@ REG_VARIABLE( CFG_EXTSCAN_ENABLE, WLAN_PARAM_Integer,
                CFG_ENABLE_SAE_FOR_SAP_MIN,
                CFG_ENABLE_SAE_FOR_SAP_MAX),
 #endif
+
+#ifdef FEATURE_WLAN_SW_PTA
+  REG_VARIABLE(CFG_SW_PTA_ENABLE_NAME, WLAN_PARAM_Integer,
+               hdd_config_t, is_sw_pta_enabled,
+               VAR_FLAGS_OPTIONAL | VAR_FLAGS_RANGE_CHECK_ASSUME_DEFAULT,
+               CFG_SW_PTA_ENABLE_DEFAULT,
+               CFG_SW_PTA_ENABLE_MIN,
+               CFG_SW_PTA_ENABLE_MAX)
+#endif
 };
 
 /*
@@ -4291,6 +4306,19 @@ static void hdd_cfg_print_sae(hdd_context_t *hdd_ctx)
 }
 
 static void hdd_cfg_print_sae_sap(hdd_context_t *hdd_ctx)
+{
+}
+#endif
+
+#ifdef FEATURE_WLAN_SW_PTA
+static void hdd_cfg_print_sw_pta(hdd_context_t* hdd_ctx)
+{
+   hddLog(LOG2, "Name = [%s] value = [%u]",
+          CFG_SW_PTA_ENABLE_NAME,
+          hdd_ctx->cfg_ini->is_sw_pta_enabled);
+}
+#else
+static void hdd_cfg_print_sw_pta(hdd_context_t* hdd_ctx)
 {
 }
 #endif
@@ -4757,6 +4785,7 @@ static void print_hdd_cfg(hdd_context_t *pHddCtx)
             pHddCtx->cfg_ini->enabledefaultSAP);
     hdd_cfg_print_sae(pHddCtx);
     hdd_cfg_print_sae_sap(pHddCtx);
+    hdd_cfg_print_sw_pta(pHddCtx);
 }
 
 
@@ -5907,6 +5936,14 @@ v_BOOL_t hdd_update_config_dat( hdd_context_t *pHddCtx )
      {
          fStatus = FALSE;
          hddLog(LOGE, "Could not pass on WNI_CFG_VHT_RXSTBC to CCM");
+     }
+
+     if (ccmCfgSetInt(pHddCtx->hHal, WNI_CFG_VHT_TXSTBC,
+                     pConfig->enableTxSTBC, NULL, eANI_BOOLEAN_FALSE)
+         == eHAL_STATUS_FAILURE)
+     {
+         fStatus = FALSE;
+         hddLog(LOGE, "Could not pass on WNI_CFG_VHT_TXSTBC to CCM");
      }
 
 #ifdef WLAN_SOFTAP_VSTA_FEATURE
