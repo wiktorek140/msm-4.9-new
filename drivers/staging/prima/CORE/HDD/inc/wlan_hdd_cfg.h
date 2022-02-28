@@ -2110,6 +2110,11 @@ static __inline tANI_U32 defHddRateToDefCfgRate( tANI_U32 defRateIndex )
 #define CFG_ENABLE_RX_STBC_MAX                   ( 1 )
 #define CFG_ENABLE_RX_STBC_DEFAULT               ( 1 )
 
+#define CFG_ENABLE_TX_STBC                       "gEnableTXSTBC"
+#define CFG_ENABLE_TX_STBC_MIN                   ( 0 )
+#define CFG_ENABLE_TX_STBC_MAX                   ( 1 )
+#define CFG_ENABLE_TX_STBC_DEFAULT               ( 1 )
+
 /* 
  * Enable/Disable vsta based on MAX Assoc limit 
  * defined in WCNSS_qcom_cfg.ini.
@@ -3317,6 +3322,11 @@ This feature requires the dependent cfg.ini "gRoamPrefer5GHz" set to 1 */
 #define CFG_ENABLE_SAE_FOR_SAP_MIN     (0)
 #define CFG_ENABLE_SAE_FOR_SAP_MAX     (1)
 
+#define CFG_SW_PTA_ENABLE_NAME         "sw_pta_enable"
+#define CFG_SW_PTA_ENABLE_DEFAULT      (0)
+#define CFG_SW_PTA_ENABLE_MIN          (0)
+#define CFG_SW_PTA_ENABLE_MAX          (1)
+
 /*--------------------------------------------------------------------------- 
   Type declarations
   -------------------------------------------------------------------------*/ 
@@ -3690,6 +3700,7 @@ typedef struct
    v_U16_t                     configMccParam;
    v_U32_t                     numBuffAdvert;
    v_BOOL_t                    enableRxSTBC;
+   v_BOOL_t                    enableTxSTBC;
 #ifdef FEATURE_WLAN_TDLS       
    v_BOOL_t                    fEnableTDLSSupport;
    v_BOOL_t                    fEnableTDLSImplicitTrigger;
@@ -3939,6 +3950,9 @@ typedef struct
 #endif
 #ifdef FEATURE_WLAN_LFR
    uint8_t                     bssid_blacklist_timeout;
+#endif
+#ifdef FEATURE_WLAN_SW_PTA
+   bool                        is_sw_pta_enabled;
 #endif
 } hdd_config_t;
 

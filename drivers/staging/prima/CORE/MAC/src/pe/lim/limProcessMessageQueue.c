@@ -674,10 +674,10 @@ limCheckMgmtRegisteredFrames(tpAniSirGlobal pMac, tANI_U8 *pBd,
         pNext = NULL;
     }
    
+    limLog( pMac, LOG1,
+                FL("rcvd frame match with registered frame params match %d fc.type %d fc.subType %d"), match, fc.type, fc.subType);
     if (match)
     {
-        limLog( pMac, LOG1, 
-                FL("rcvd frame match with registered frame params"));
 
         /* Indicate this to SME */
         limSendSmeMgmtFrameInd( pMac, pLimMgmtRegistration->sessionId,
@@ -1937,6 +1937,18 @@ limProcessMessages(tpAniSirGlobal pMac, tpSirMsgQ  limMsg)
             vos_mem_free(limMsg->bodyptr);
             limMsg->bodyptr = NULL;
             break;
+#ifdef FEATURE_WLAN_SW_PTA
+        case eWNI_SME_TEARDOWN_LINK_WITH_AP:
+        {
+            struct sir_teardown_link *msg;
+
+            msg = (struct sir_teardown_link *)limMsg->bodyptr;
+            limTearDownLinkWithAp(pMac, msg->session_id,
+                                  eSIR_MAC_UNSPEC_FAILURE_REASON);
+            vos_mem_free(limMsg->bodyptr);
+            limMsg->bodyptr = NULL;
+        }
+#endif
 
 #ifdef WLAN_FEATURE_RMC
         case eWNI_SME_ENABLE_RMC_REQ:

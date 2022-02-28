@@ -6680,6 +6680,24 @@ struct WDI_sap_ofl_enable_params{
     wpt_uint32 tsf_hi;
 } wdi_cap_tsf_rsp_t;
 
+#ifdef FEATURE_WLAN_SW_PTA
+/**
+ * wdi_sw_pta_req - SW PTA coex params request
+ * @bt_enabled: BT status
+ * @bt_adv: BT advertisement status
+ * @ble_enabled: BLE status
+ * @bt_a2dp: BT A2DP status
+ * @bt_sco: BT SCO status
+ */
+struct wdi_sw_pta_req {
+	bool bt_enabled;
+	bool bt_adv;
+	bool ble_enabled;
+	bool bt_a2dp;
+	bool bt_sco;
+};
+#endif
+
 /*----------------------------------------------------------------------------
  *   WDI callback types
  *--------------------------------------------------------------------------*/
@@ -12563,5 +12581,21 @@ wdi_process_get_tsf_req (wdi_cap_tsf_params_t *wdi_get_tsf_req,
                          wdi_tsf_rsp_cb wdi_tsf_rsp_callback,
                          void *user_data);
 
+#ifdef FEATURE_WLAN_SW_PTA
+typedef void (*WDI_sw_pta_resp_cb)(uint8_t status, void *user_data);
 
+/**
+ * @WDI_sw_pta_req - SW PTA request
+ *
+ * @wdi_sw_pta_resp_cb: WDI sw pta response callback
+ * @wdi_sw_pta_req: sw pta request params
+ * @user_data: user data
+ *
+ * @Return: WDI_Status
+ */
+WDI_Status
+WDI_sw_pta_req(WDI_sw_pta_resp_cb wdi_sw_pta_resp_cb,
+	       struct wdi_sw_pta_req *wdi_sw_pta_req,
+	       void *user_data);
+#endif /* FEATURE_WLAN_SW_PTA */
 #endif /* #ifndef WLAN_QCT_WDI_H */

@@ -33,6 +33,10 @@ config WLAN_FEATURE_SAE
 	bool "Enable SAE feature"
 	default n
 
+config WLAN_FEATURE_SW_PTA
+	bool "Enable SW PTA feature"
+	default n
+
 config WLAN_AKM_SUITE_OWE
 	bool "Enable OWE feature"
 	default n

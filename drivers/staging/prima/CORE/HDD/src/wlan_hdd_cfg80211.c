@@ -99,7 +99,7 @@
 #include "qwlan_version.h"
 #include "wlan_logging_sock_svc.h"
 #include "wlan_hdd_misc.h"
-
+#include <linux/wcnss_wlan.h>
 
 #define g_mode_rates_size (12)
 #define a_mode_rates_size (8)
@@ -619,6 +619,14 @@ static const struct nla_policy wlan_hdd_tm_policy[WLAN_HDD_TM_ATTR_MAX + 1] =
                                     .len = WLAN_HDD_TM_DATA_MAX_LEN },
 };
 #endif /* WLAN_NL80211_TESTMODE */
+
+#ifdef FEATURE_WLAN_SW_PTA
+bool hdd_is_sw_pta_enabled(hdd_context_t *hdd_ctx)
+{
+	return hdd_ctx->cfg_ini->is_sw_pta_enabled ||
+		wcnss_is_sw_pta_enabled();
+}
+#endif
 
 #ifdef FEATURE_WLAN_CH_AVOID
 /*
@@ -9793,6 +9801,11 @@ int wlan_hdd_cfg80211_init(struct device *dev,
     {
         wlan_hdd_band_5_GHZ.ht_cap.cap &= ~IEEE80211_HT_CAP_SUP_WIDTH_20_40;
     }
+    if (pCfg->enableTxSTBC)
+    {
+        wlan_hdd_band_2_4_GHZ.vht_cap.cap |= IEEE80211_VHT_CAP_TXSTBC;
+        wlan_hdd_band_5_GHZ.vht_cap.cap |= IEEE80211_VHT_CAP_TXSTBC;
+    }
     /*
      * In case of static linked driver at the time of driver unload,
      * module exit doesn't happens. Module cleanup helps in cleaning
@@ -12612,6 +12625,7 @@ static int __wlan_hdd_cfg80211_start_ap(struct wiphy *wiphy,
                                              params->auth_type);
     }
 
+    wlan_hdd_cfg80211_register_frames(pAdapter);
     EXIT();
     return status;
 }
@@ -12789,6 +12803,7 @@ int __wlan_hdd_cfg80211_change_iface( struct wiphy *wiphy,
     eMib_dot11DesiredBssType connectedBssType;
     VOS_STATUS status;
     long ret;
+    bool iff_up = ndev->flags & IFF_UP;
 
     ENTER();
 
@@ -13061,22 +13076,22 @@ int __wlan_hdd_cfg80211_change_iface( struct wiphy *wiphy,
                          return -EINVAL;
                     }
                 }
-                status = hdd_init_ap_mode(pAdapter, false);
-                if(status != VOS_STATUS_SUCCESS)
-                {
-                    hddLog(VOS_TRACE_LEVEL_FATAL,
-                           "%s: Error initializing the ap mode", __func__);
-                    return -EINVAL;
-                }
+		if (iff_up) {
+			hddLog(VOS_TRACE_LEVEL_DEBUG,
+			       "%s: SAP interface is already up", __func__);
+			status = hdd_init_ap_mode(pAdapter, false);
+			if(status != VOS_STATUS_SUCCESS)
+			{
+				hddLog(VOS_TRACE_LEVEL_FATAL,
+				       "%s: Error initializing the ap mode",
+				       __func__);
+				return -EINVAL;
+			}
+		} else {
+			hddLog(VOS_TRACE_LEVEL_DEBUG,
+			       "%s: SAP interface is down", __func__);
+		}
                 hdd_set_conparam(1);
-
-                status = hdd_sta_id_hash_attach(pAdapter);
-                if (VOS_STATUS_SUCCESS != status)
-                {
-                    hddLog(VOS_TRACE_LEVEL_ERROR,
-                           FL("Failed to initialize hash for AP"));
-                    return -EINVAL;
-                }
 
                 /*interface type changed update in wiphy structure*/
                 if(wdev)
@@ -13153,9 +13168,16 @@ int __wlan_hdd_cfg80211_change_iface( struct wiphy *wiphy,
 #ifdef FEATURE_WLAN_TDLS
                 mutex_unlock(&pHddCtx->tdls_lock);
 #endif
-                status = hdd_init_station_mode( pAdapter );
-                if( VOS_STATUS_SUCCESS != status )
-                    return -EOPNOTSUPP;
+		if (iff_up) {
+			hddLog(VOS_TRACE_LEVEL_DEBUG,
+			       "%s: STA interface is already up", __func__);
+			status = hdd_init_station_mode( pAdapter );
+			if( VOS_STATUS_SUCCESS != status )
+				return -EOPNOTSUPP;
+		} else {
+			hddLog(VOS_TRACE_LEVEL_DEBUG,
+			       "%s: STA interface is down", __func__);
+		}
                 /* In case of JB, for P2P-GO, only change interface will be called,
                  * This is the right place to enable back bmps_imps()
                  */
@@ -16086,6 +16108,19 @@ int __wlan_hdd_cfg80211_scan( struct wiphy *wiphy,
     }
     mutex_unlock(&pHddCtx->tmInfo.tmOperationLock);
 
+    /**
+     * If sw pta is enabled, scan should not allowed.
+     * Returning error makes framework to trigger scan continuously
+     * for every second, so indicating framework that scan is aborted
+     * and return success.
+     */
+    if (hdd_is_sw_pta_enabled(pHddCtx) && pHddCtx->is_sco_enabled) {
+        VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_INFO,
+                  FL("BT SCO operation in progress"));
+        hdd_cfg80211_scan_done(pAdapter, request, true);
+        return 0;
+    }
+
     /* Check if scan is allowed at this point of time.
      */
     if (TRUE == pHddCtx->btCoexModeSet)
@@ -16222,14 +16257,23 @@ int __wlan_hdd_cfg80211_scan( struct wiphy *wiphy,
 
     if( request->n_channels )
     {
-        char chList [(request->n_channels*5)+1];
         int len;
+	char *chList;
+
+	chList = vos_mem_malloc((request->n_channels * 5) + 1);
+	if (!chList) {
+		hddLog(VOS_TRACE_LEVEL_ERROR,
+		       "%s: memory alloc failed channelList", __func__);
+		status = -ENOMEM;
+	}
+
         channelList = vos_mem_malloc( request->n_channels );
         if( NULL == channelList )
         {
             hddLog(VOS_TRACE_LEVEL_ERROR,
                            "%s: memory alloc failed channelList", __func__);
             status = -ENOMEM;
+	    vos_mem_free(chList);
             goto free_mem;
         }
 
@@ -16241,6 +16285,7 @@ int __wlan_hdd_cfg80211_scan( struct wiphy *wiphy,
 
         hddLog(VOS_TRACE_LEVEL_INFO,
                            "Channel-List:  %s ", chList);
+	vos_mem_free(chList);
     }
 
     scanRequest.ChannelInfo.numOfChannels = request->n_channels;
@@ -16604,6 +16649,14 @@ int wlan_hdd_cfg80211_connect_start( hdd_adapter_t  *pAdapter,
         return -EINVAL;
     }
 
+    /**
+     * If sw pta is enabled, new connections should not allowed.
+     */
+    if (hdd_is_sw_pta_enabled(pHddCtx) && pHddCtx->is_sco_enabled) {
+        hddLog(VOS_TRACE_LEVEL_ERROR, "%s: BT SCO operation in progress",
+               __func__);
+        return -EINVAL;
+    }
 
     pRoamProfile = &pWextState->roamProfile;
 
@@ -17019,6 +17072,102 @@ static int wlan_hdd_cfg80211_set_cipher( hdd_adapter_t *pAdapter,
     return 0;
 }
 
+static void framesntohs(v_U16_t *pOut,
+                        v_U8_t  *pIn,
+                        unsigned char fMsb)
+{
+#   if defined ( DOT11F_LITTLE_ENDIAN_HOST )
+    if ( !fMsb )
+    {
+        vos_mem_copy(( v_U16_t* )pOut, pIn, 2);
+    }
+    else
+    {
+        *pOut = ( v_U16_t )( *pIn << 8 ) | *( pIn + 1 );
+    }
+#   else
+    if ( !fMsb )
+    {
+        *pOut = ( v_U16_t )( *pIn | ( *( pIn + 1 ) << 8 ) );
+    }
+    else
+    {
+        vos_mem_copy(( v_U16_t* )pOut, pIn, 2);
+    }
+#   endif
+}
+
+void
+wlan_hdd_mask_unsupported_rsn_caps(tANI_U8 *pBuf, tANI_S16 ielen)
+{
+    u16 pwise_cipher_suite_count, akm_suite_cnt, mask = 0;
+    u8 *rsn_cap;
+
+    if (unlikely(ielen < 2)) {
+        return;
+    }
+
+    pBuf += 2;
+    ielen -= (tANI_U8)2;
+
+    if (unlikely(ielen < 4)) {
+        return;
+    }
+
+    pBuf += 4;
+    ielen -= (tANI_U8)4;
+
+    if (unlikely(ielen < 2)) {
+        return;
+    }
+
+    framesntohs(&pwise_cipher_suite_count, pBuf, 0);
+    pBuf += 2;
+    ielen -= (tANI_U8)2;
+
+    if (unlikely(ielen < pwise_cipher_suite_count * 4)) {
+        return;
+    }
+
+    if (!pwise_cipher_suite_count ||
+        pwise_cipher_suite_count > 4){
+        return;
+    }
+
+    pBuf += (pwise_cipher_suite_count * 4);
+    ielen -= (pwise_cipher_suite_count * 4);
+
+    if (unlikely(ielen < 2)) {
+        return;
+    }
+
+    framesntohs(&akm_suite_cnt, pBuf, 0);
+    pBuf += 2;
+    ielen -= (tANI_U8)2;
+
+    if (unlikely(ielen < akm_suite_cnt * 4)) {
+        return;
+    }
+
+    if (!akm_suite_cnt ||
+        akm_suite_cnt > 4){
+        return;
+    }
+
+    pBuf += (akm_suite_cnt * 4);
+    ielen -= (akm_suite_cnt * 4);
+
+    if (unlikely(ielen < 2)) {
+        return;
+    }
+
+    rsn_cap = pBuf;
+    mask = ~(JOINT_MULTI_BAND_RSNA | PEER_KEY_ENABLED | AMSDU_CAPABLE |
+             AMSDU_REQUIRED | PBAC | EXT_KEY_ID | OCVC | RESERVED);
+    rsn_cap[1] &= mask;
+
+    return;
+}
 
 /*
  * FUNCTION: wlan_hdd_cfg80211_set_ie
@@ -17331,6 +17480,8 @@ int wlan_hdd_cfg80211_set_ie( hdd_adapter_t *pAdapter,
                 memcpy( pWextState->WPARSNIE, genie - 2, (eLen + 2)/*ie_len*/);
                 pWextState->roamProfile.pRSNReqIE = pWextState->WPARSNIE;
                 pWextState->roamProfile.nRSNReqIELength = eLen + 2; //ie_len;
+                wlan_hdd_mask_unsupported_rsn_caps(pWextState->WPARSNIE + 2,
+                                                   eLen);
                 break;
 
                 /* Appending extended capabilities with Interworking or
@@ -20359,6 +20510,15 @@ void hdd_cfg80211_sched_scan_done_callback(void *callbackContext,
     }
     spin_unlock(&pHddCtx->schedScan_lock);
 
+    /**
+     * If sw pta is enabled, scan results should not send to framework.
+     */
+    if (hdd_is_sw_pta_enabled(pHddCtx) && pHddCtx->is_sco_enabled) {
+        VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_INFO,
+                  FL("BT SCO operation in progress"));
+        return;
+    }
+
     ret = wlan_hdd_cfg80211_update_bss(pHddCtx->wiphy, pAdapter);
 
     if (0 > ret)
@@ -20640,9 +20800,17 @@ static int __wlan_hdd_cfg80211_sched_scan_start(struct wiphy *wiphy,
     num_ch = 0;
     if (request->n_channels)
     {
-        char chList [(request->n_channels*5)+1];
         int len;
-        for (i = 0, len = 0; i < request->n_channels; i++)
+	char *chList;
+
+	chList = vos_mem_malloc((request->n_channels * 5) + 1);
+	if (!chList) {
+		hddLog(VOS_TRACE_LEVEL_ERROR,
+		       "%s: memory alloc failed channelList", __func__);
+		status = -ENOMEM;
+	}
+
+	for (i = 0, len = 0; i < request->n_channels; i++)
         {
             for (indx = 0; indx < num_channels_allowed; indx++)
             {
@@ -20673,8 +20841,10 @@ static int __wlan_hdd_cfg80211_sched_scan_start(struct wiphy *wiphy,
             VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_INFO,
              "%s : All requested channels are DFS channels", __func__);
             ret = -EINVAL;
+	    vos_mem_free(chList);
             goto error;
         }
+	vos_mem_free(chList);
      }
 
     pnoRequest.aNetworks =
