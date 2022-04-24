@@ -651,12 +651,12 @@ int q6core_get_avcs_api_version_per_service(uint32_t service_id)
         if (service_id == AVCS_SERVICE_ID_ALL)
                 return -EINVAL;
 
-        if (service_id == APRV2_IDS_SERVICE_ID_ADSP_ASM_V || service_id == APRV2_IDS_SERVICE_ID_ADSP_ADM_V)
-                return 1;
+		if (service_id == APRV2_IDS_SERVICE_ID_ADSP_ASM_V || service_id == APRV2_IDS_SERVICE_ID_ADSP_ADM_V)
+			return 1;
 
         ret = q6core_get_avcs_fwk_version();
         if (ret < 0) {
-                pr_err("%s: failure in getting AVCS version\n", __func__);
+                pr_err("%s: failure in getting AVCS version: %d\n", __func__, service_id);
                 return ret;
         }
 
