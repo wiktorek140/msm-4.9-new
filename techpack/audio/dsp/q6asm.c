@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2019, The Linux Foundation. All rights reserved.
  * Author: Brian Swetland <swetland@google.com>
  *
  * This software is licensed under the terms of the GNU General Public
@@ -44,7 +44,7 @@
 
 #define TRUE        0x01
 #define FALSE       0x00
-#define SESSION_MAX ASM_ACTIVE_STREAMS_ALLOWED
+#define SESSION_MAX 8
 
 enum {
 	ASM_TOPOLOGY_CAL = 0,
@@ -1450,7 +1450,7 @@ int q6asm_audio_client_buf_alloc(unsigned int dir,
 	pr_debug("%s: session[%d]bufsz[%d]bufcnt[%d]\n", __func__, ac->session,
 		bufsz, bufcnt);
 
-	if (ac->session <= 0 || ac->session > ASM_ACTIVE_STREAMS_ALLOWED) {
+	if (ac->session <= 0 || ac->session > 8) {
 		pr_err("%s: Session ID is invalid, session = %d\n", __func__,
 			ac->session);
 		goto fail;
@@ -1553,7 +1553,7 @@ int q6asm_audio_client_buf_alloc_contiguous(unsigned int dir,
 			__func__, ac->session,
 			bufsz, bufcnt);
 
-	if (ac->session <= 0 || ac->session > ASM_ACTIVE_STREAMS_ALLOWED) {
+	if (ac->session <= 0 || ac->session > 8) {
 		pr_err("%s: Session ID is invalid, session = %d\n", __func__,
 			ac->session);
 		goto fail;
@@ -1780,11 +1780,10 @@ static int32_t q6asm_srvc_callback(struct apr_client_data *data, void *priv)
 
 	if (dir != IN && dir != OUT) {
 		pr_err("%s: Invalid audio port index: %d\n", __func__, dir);
-		if ((session_id > 0 && session_id <= SESSION_MAX)) {
+		if ((session_id > 0 && session_id <= SESSION_MAX))
 			spin_unlock_irqrestore(
 				&(session[session_id].session_lock), flags);
-			return 0;
-		}
+		return 0;
 	}
 	port = &ac->port[dir];
 
@@ -7769,7 +7768,6 @@ int q6asm_memory_map(struct audio_client *ac, phys_addr_t buf_add, int dir,
 	if (mmap_region_cmd == NULL) {
 		rc = -EINVAL;
 		kfree(buffer_node);
-		buffer_node = NULL;
 		return rc;
 	}
 	mmap_regions = (struct avs_cmd_shared_mem_map_regions *)
@@ -7799,7 +7797,6 @@ int q6asm_memory_map(struct audio_client *ac, phys_addr_t buf_add, int dir,
 					mmap_regions->hdr.opcode, rc);
 		rc = -EINVAL;
 		kfree(buffer_node);
-		buffer_node = NULL;
 		goto fail_cmd;
 	}
 
@@ -7810,7 +7807,6 @@ int q6asm_memory_map(struct audio_client *ac, phys_addr_t buf_add, int dir,
 		pr_err("%s: timeout. waited for memory_map\n", __func__);
 		rc = -ETIMEDOUT;
 		kfree(buffer_node);
-		buffer_node = NULL;
 		goto fail_cmd;
 	}
 	if (atomic_read(&ac->mem_state) > 0) {
@@ -7820,7 +7816,6 @@ int q6asm_memory_map(struct audio_client *ac, phys_addr_t buf_add, int dir,
 		rc = adsp_err_get_lnx_err_code(
 			atomic_read(&ac->mem_state));
 		kfree(buffer_node);
-		buffer_node = NULL;
 		goto fail_cmd;
 	}
 	buffer_node->buf_phys_addr = buf_add;
@@ -7831,7 +7826,6 @@ int q6asm_memory_map(struct audio_client *ac, phys_addr_t buf_add, int dir,
 
 fail_cmd:
 	kfree(mmap_region_cmd);
-	mmap_region_cmd = NULL;
 	return rc;
 }
 EXPORT_SYMBOL(q6asm_memory_map);
@@ -8007,7 +8001,6 @@ static int q6asm_memory_map_regions(struct audio_client *ac, int dir,
 	if (mmap_region_cmd == NULL) {
 		rc = -EINVAL;
 		kfree(buffer_node);
-		buffer_node = NULL;
 		return rc;
 	}
 	mmap_regions = (struct avs_cmd_shared_mem_map_regions *)
@@ -8044,7 +8037,6 @@ static int q6asm_memory_map_regions(struct audio_client *ac, int dir,
 					mmap_regions->hdr.opcode, rc);
 		rc = -EINVAL;
 		kfree(buffer_node);
-		buffer_node = NULL;
 		goto fail_cmd;
 	}
 
@@ -8055,7 +8047,6 @@ static int q6asm_memory_map_regions(struct audio_client *ac, int dir,
 		pr_err("%s: timeout. waited for memory_map\n", __func__);
 		rc = -ETIMEDOUT;
 		kfree(buffer_node);
-		buffer_node = NULL;
 		goto fail_cmd;
 	}
 	if (atomic_read(&ac->mem_state) > 0) {
@@ -8065,7 +8056,6 @@ static int q6asm_memory_map_regions(struct audio_client *ac, int dir,
 		rc = adsp_err_get_lnx_err_code(
 			atomic_read(&ac->mem_state));
 		kfree(buffer_node);
-		buffer_node = NULL;
 		goto fail_cmd;
 	}
 	mutex_lock(&ac->cmd_lock);
@@ -8085,7 +8075,6 @@ static int q6asm_memory_map_regions(struct audio_client *ac, int dir,
 	rc = 0;
 fail_cmd:
 	kfree(mmap_region_cmd);
-	mmap_region_cmd = NULL;
 	return rc;
 }
 EXPORT_SYMBOL(q6asm_memory_map_regions);
@@ -11008,15 +10997,9 @@ int q6asm_send_cal(struct audio_client *ac)
 
 	mutex_lock(&cal_data[ASM_AUDSTRM_CAL]->lock);
 	cal_block = cal_utils_get_only_cal_block(cal_data[ASM_AUDSTRM_CAL]);
-	if (cal_block == NULL) {
-		pr_err("%s: cal_block is NULL\n",
-			__func__);
-		goto unlock;
-	}
-
-	if (cal_utils_is_cal_stale(cal_block)) {
+	if (cal_block == NULL || cal_utils_is_cal_stale(cal_block)) {
 		rc = 0; /* not error case */
-		pr_err("%s: cal_block is stale\n",
+		pr_err("%s: cal_block is NULL or stale\n",
 			__func__);
 		goto unlock;
 	}
