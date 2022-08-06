@@ -168,3 +168,11 @@
 
 	status = "ok";
 };
+
+&msm_digital_codec {
+	status = "okay";
+};
+
+&pmic_analog_codec {
+	status = "okay";
+};
