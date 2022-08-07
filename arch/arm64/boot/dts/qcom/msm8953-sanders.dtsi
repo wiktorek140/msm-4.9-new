@@ -843,7 +843,7 @@
 	};
 };
 
-$qpnp_smbcharger {
+&qpnp_smbcharger {
 	status = "okay";
 	/delete-property/ qcom,iterm-ma;
 	qcom,iterm-disabled;
