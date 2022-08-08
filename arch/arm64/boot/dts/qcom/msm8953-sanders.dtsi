@@ -406,7 +406,130 @@
 	};
 
 	qcom,sensor-information {
-		/delete-node/ sensor_information18;
+		compatible = "qcom,sensor-information";
+		sensor_information0: qcom,sensor-information-0 {
+			qcom,sensor-type = "tsens";
+			qcom,sensor-name = "tsens_tz_sensor0";
+			qcom,scaling-factor = <10>;
+		};
+
+		sensor_information1: qcom,sensor-information-1 {
+			qcom,sensor-type =  "tsens";
+			qcom,sensor-name = "tsens_tz_sensor1";
+			qcom,scaling-factor = <10>;
+		};
+
+		sensor_information2: qcom,sensor-information-2 {
+			qcom,sensor-type =  "tsens";
+			qcom,sensor-name = "tsens_tz_sensor2";
+			qcom,alias-name = "pop_mem";
+			qcom,scaling-factor = <10>;
+		};
+
+		sensor_information3: qcom,sensor-information-3 {
+			qcom,sensor-type =  "tsens";
+			qcom,sensor-name = "tsens_tz_sensor3";
+			qcom,scaling-factor = <10>;
+		};
+
+		sensor_information4: qcom,sensor-information-4 {
+			qcom,sensor-type = "tsens";
+			qcom,sensor-name = "tsens_tz_sensor4";
+			qcom,scaling-factor = <10>;
+		};
+
+		sensor_information5: qcom,sensor-information-5 {
+			qcom,sensor-type = "tsens";
+			qcom,sensor-name = "tsens_tz_sensor5";
+			qcom,scaling-factor = <10>;
+		};
+
+		sensor_information6: qcom,sensor-information-6 {
+			qcom,sensor-type = "tsens";
+			qcom,sensor-name = "tsens_tz_sensor6";
+			qcom,scaling-factor = <10>;
+		};
+
+		sensor_information7: qcom,sensor-information-7 {
+			qcom,sensor-type = "tsens";
+			qcom,sensor-name = "tsens_tz_sensor7";
+			qcom,scaling-factor = <10>;
+		};
+
+		sensor_information8: qcom,sensor-information-8 {
+			qcom,sensor-type = "tsens";
+			qcom,sensor-name = "tsens_tz_sensor8";
+			qcom,scaling-factor = <10>;
+			qcom,alias-name = "L2_cache_1";
+		};
+
+		sensor_information9: qcom,sensor-information-9 {
+			qcom,sensor-type = "tsens";
+			qcom,sensor-name = "tsens_tz_sensor9";
+			qcom,scaling-factor = <10>;
+		};
+
+		sensor_information10: qcom,sensor-information-10 {
+			qcom,sensor-type = "tsens";
+			qcom,sensor-name = "tsens_tz_sensor10";
+			qcom,scaling-factor = <10>;
+		};
+
+		sensor_information11: qcom,sensor-information-11 {
+			qcom,sensor-type = "tsens";
+			qcom,sensor-name = "tsens_tz_sensor11";
+			qcom,scaling-factor = <10>;
+		};
+
+		sensor_information12: qcom,sensor-information-12 {
+			qcom,sensor-type = "tsens";
+			qcom,sensor-name = "tsens_tz_sensor12";
+			qcom,scaling-factor = <10>;
+		};
+
+		sensor_information13: qcom,sensor-information-13 {
+			qcom,sensor-type = "tsens";
+			qcom,sensor-name = "tsens_tz_sensor13";
+			qcom,scaling-factor = <10>;
+			qcom,alias-name = "L2_cache_0";
+		};
+
+		sensor_information14: qcom,sensor-information-14 {
+			qcom,sensor-type = "tsens";
+			qcom,sensor-name = "tsens_tz_sensor14";
+			qcom,scaling-factor = <10>;
+		};
+
+		sensor_information15: qcom,sensor-information-15 {
+			qcom,sensor-type = "tsens";
+			qcom,sensor-name = "tsens_tz_sensor15";
+			qcom,alias-name = "gpu";
+			qcom,scaling-factor = <10>;
+		};
+
+		sensor_information16: qcom,sensor-information-16 {
+			qcom,sensor-type =  "alarm";
+			qcom,sensor-name = "pm8953_tz";
+			qcom,scaling-factor = <1000>;
+		};
+
+		sensor_information17: qcom,sensor-information-17 {
+			qcom,sensor-type =  "adc";
+			qcom,sensor-name = "pa_therm0";
+		};
+                
+                sensor_information18: qcom,sensor-information-18 {
+		};
+
+		sensor_information19: qcom,sensor-information-19 {
+			qcom,sensor-type =  "adc";
+			qcom,sensor-name = "xo_therm";
+		};
+
+		sensor_information20: qcom,sensor-information-20 {
+			qcom,sensor-type =  "adc";
+			qcom,sensor-name = "xo_therm_buf";
+		};
 
 		sensor_information21: qcom,sensor-information-21 {
 			qcom,sensor-type = "adc";
@@ -494,7 +617,6 @@
 			"AMIC2", "MIC BIAS Internal2",
 			"AMIC3", "MIC BIAS External";
 		/delete-property/ qcom,cdc-us-euro-gpios;
-		/delete-property/ qcom,hdmi-dba-codec-rx;
 		/delete-property/ asoc-wsa-codec-names;
 		/delete-property/ asoc-wsa-codec-prefixes;
 
@@ -592,7 +714,7 @@
 			&cdc_pdm_lines_2_act &pri_tlmm_lines_act
 			&pri_tlmm_ws_act &cs35l35_mclk_on>;
 
-		asoc-codec = <&stub_codec>, <&pm8953_diangu_dig>;
+		asoc-codec = <&stub_codec>, <&msm_digital_codec>;
 		asoc-codec-names = "msm-stub-codec.1", "cajon_codec";
 	};
 
@@ -608,7 +730,7 @@
 &pm8953_1 {
 	/delete-node/ analog-codec@f000;
 
-	pm8953_diangu_dig: analog-codec@f000 {
+	msm_digital_codec: analog-codec@f000 {
 		compatible = "qcom,pmic-analog-codec";
 		reg = <0xf000 0x100>;
 		interrupt-parent = <&spmi_bus>;
@@ -844,7 +966,7 @@
 	};
 };
 
-$qpnp_smbcharger {
+&qpnp_smbcharger {
 	status = "okay";
 	/delete-property/ qcom,iterm-ma;
 	qcom,iterm-disabled;
